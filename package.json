@@ -1,12 +1,12 @@
 {
   "name": "com.sukwoo.utility",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Suk Utility Package",
   "author": {
     "name": "sukwoo"
   },
   "description": "최석우 유틸리티 패키지",
-  "unity": "2020.3",
+  "unity": "2022.3",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2"
   }
