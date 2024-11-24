@@ -8,6 +8,7 @@
   "description": "최석우 유틸리티 패키지",
   "unity": "2022.3",
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.0.2"
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
+    "com.cysharp.unitask": "2.3.3"
   }
 }

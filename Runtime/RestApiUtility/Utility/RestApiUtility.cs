@@ -1,8 +1,10 @@
+using Cysharp.Threading.Tasks;
 using Suk.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -73,7 +75,7 @@ namespace Suk.RestApi {
 				case ContentTypeState.Video:
 				return (T)(object)request.downloadHandler.data;
 				default:
-				throw new System.Exception("Unsupported content type.");
+				throw new Exception("Unsupported content type.");
 			}
 		}
 
@@ -126,6 +128,22 @@ namespace Suk.RestApi {
 			onProgress?.Invoke(1f);
 		}
 
+		public static async UniTask UpdateProgress(UnityWebRequestAsyncOperation asyncOperation, UnityAction<float> progress = null, CancellationToken token = default) {
+			float lastProgress = 0f;
+			float lastProgressUpdate = Time.time;
+
+			while(!asyncOperation.isDone) {
+				if(Time.time >= lastProgressUpdate + minUpdateInterval || Mathf.Abs(asyncOperation.progress - lastProgress) >= minProgressChange) {
+					progress?.Invoke(asyncOperation.progress); // 진행률 업데이트
+					lastProgress = asyncOperation.progress;
+					lastProgressUpdate = Time.time;
+				}
+				await UniTask.Yield(PlayerLoopTiming.Update, token); // 프레임 대기 (취소 토큰 지원)
+			}
+
+			progress?.Invoke(1f);
+		}
+
 		public static string GetAudioMimeType(AudioContentType contentType) {
 			return contentType switch {
 				AudioContentType.MP3 => "audio/mpeg",
@@ -164,6 +182,10 @@ namespace Suk.RestApi {
 			yield return execute();
 		}
 
+		public static async UniTask ExecuteWithAuth(string authToken, Dictionary<string, string> headers, Func<UniTask> execute) {
+			SetAuthHeader(ref headers, authToken); // 인증 헤더 설정
+			await execute(); // 비동기 작업 실행
+		}
 
 		public static void HandleJsonResponse<T>(ApiResponse<string> apiResponse, UnityAction<ApiResponse<T>> onComplete = null) {
 			if(!apiResponse.Success) {
@@ -175,6 +197,15 @@ namespace Suk.RestApi {
 				onComplete?.Invoke(new SuccessResponse<T>(parsedData));
 			} catch(Exception ex) {
 				onComplete?.Invoke(new FailureResponse<T>($"JSON 파싱 오류: {ex.Message}"));
+			}
+		}
+
+		public static T HandleJsonResponse<T>(string jsonResponse) {
+			try {
+				var parsedData = JsonParser.Parse<T>(jsonResponse);
+				return parsedData;
+			} catch(Exception ex) {
+				throw new Exception($"JSON 파싱 오류: {ex.Message}");
 			}
 		}
 
@@ -193,10 +224,30 @@ namespace Suk.RestApi {
 			}
 		}
 
+		public static string HandleVideoResponse(byte[] videoData, string savePath) {
+			try {
+				// 비디오 데이터를 파일로 저장
+				File.WriteAllBytes(savePath, videoData);
+				Debug.Log($"Video saved at: {savePath}");
+				return savePath;
+			} catch(Exception ex) {
+				// 예외 발생 시 상위에서 처리 가능
+				throw new Exception($"Failed to save video: {ex.Message}");
+			}
+		}
+
+
+
 		public static IEnumerator HandleNoneSend(Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			byte[] bodyData = new byte[0]; // 빈 데이터
 			yield return execute(bodyData);
 		}
+
+		public static async UniTask HandleNoneSend(Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			byte[] bodyData = new byte[0]; // 빈 데이터
+			await execute(bodyData);
+		}
+
 
 		public static IEnumerator HandleTextSend(string text, string contentType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			SetContentHeader(ref headers, contentType);
@@ -204,16 +255,33 @@ namespace Suk.RestApi {
 			yield return execute(bodyData);
 		}
 
+		public static async UniTask HandleTextSend(string text, string contentType, Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			SetContentHeader(ref headers, contentType);
+			byte[] bodyData = System.Text.Encoding.UTF8.GetBytes(text);
+			await execute(bodyData);
+		}
+
+
 		public static IEnumerator HandleBinarySend(byte[] binaryData, string contentType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			SetContentHeader(ref headers, contentType);
 			yield return execute(binaryData);
 		}
 
+		public static async UniTask HandleBinarySend(byte[] binaryData, string contentType, Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			SetContentHeader(ref headers, contentType);
+			await execute(binaryData);
+		}
 
 		public static IEnumerator HandleJsonSend<T>(T body, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			SetContentHeader(ref headers, "application/json");
 			byte[] bodyData = JsonParser.ToByteArray(body);
 			yield return execute(bodyData);
+		}
+
+		public static async UniTask HandleJsonSend<T>(T body, Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			SetContentHeader(ref headers, "application/json");
+			byte[] bodyData = JsonParser.ToByteArray(body);
+			await execute(bodyData);
 		}
 
 		public static IEnumerator HandleAudioSend(byte[] audioData, AudioContentType audioType, Dictionary<string, string> headers, Func<byte[], AudioType, IEnumerator> execute) {
@@ -223,11 +291,25 @@ namespace Suk.RestApi {
 			yield return execute(audioData, unityAudioType); // 준비된 데이터를 다음 단계로 전달
 		}
 
+		public static async UniTask HandleAudioSend(byte[] audioData, AudioContentType audioType, Dictionary<string, string> headers, Func<byte[], AudioType, UniTask> execute) {
+			string contentType = GetAudioMimeType(audioType); // AudioContentType에 따라 MIME 타입 결정
+			SetContentHeader(ref headers, contentType); // 헤더 설정
+			AudioType unityAudioType = ConvertToUnityAudioType(audioType); // Unity에서 사용하는 AudioType으로 변환
+			await execute(audioData, unityAudioType);
+		}
+
 		public static IEnumerator HandleVideoSend(byte[] videoData, VideoContentType videoType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			string contentType = GetVideoMimeType(videoType);
 			SetContentHeader(ref headers, contentType);
 			yield return execute(videoData);
 		}
+
+		public static async UniTask HandleVideoSend(byte[] videoData, VideoContentType videoType, Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			string contentType = GetVideoMimeType(videoType);
+			SetContentHeader(ref headers, contentType);
+			await execute(videoData);
+		}
+
 
 		public static IEnumerator HandleImageSend(byte[] imageData, ImageContentType imageType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			string contentType = GetImageMimeType(imageType);
@@ -235,11 +317,24 @@ namespace Suk.RestApi {
 			yield return execute(imageData);
 		}
 
+		public static async UniTask HandleImageSend(byte[] imageData, ImageContentType imageType, Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			string contentType = GetImageMimeType(imageType);
+			SetContentHeader(ref headers, contentType);
+			await execute(imageData);
+		}
 		public static IEnumerator HandleMultipartSend(MultipartFormData multipartData, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute) {
 			SetContentHeader(ref headers, $"multipart/form-data; boundary={multipartData.Boundary}");
 			byte[] bodyData = multipartData.ToBytes();
 			yield return execute(bodyData);
 		}
+
+		public static async UniTask HandleMultipartSend(MultipartFormData multipartData, Dictionary<string, string> headers, Func<byte[], UniTask> execute) {
+			SetContentHeader(ref headers, $"multipart/form-data; boundary={multipartData.Boundary}");
+			byte[] bodyData = multipartData.ToBytes();
+			await execute(bodyData);
+		}
+
+		//GetBase
 
 
 	}

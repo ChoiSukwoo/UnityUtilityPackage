@@ -6,6 +6,7 @@ using UnityEngine.Events;
 namespace Suk.RestApi {
 	public static class RestApi {
 
+		#region Get
 		public static IEnumerator GetJsonWithAuth<T>(string url, string authToken, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
 			=> RestApiGet.GetJsonWithAuth(url, authToken, onComplete, onProgress, headers);
 
@@ -31,9 +32,23 @@ namespace Suk.RestApi {
 			=> RestApiGet.GetVideo(url, savePath, onComplete, onProgress, headers);
 
 		public static IEnumerator GetAssetWithAuth(string url, string authToken, UnityAction<ApiResponse<AssetBundle>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
-			=> RestApiGet.GetAssetWithAuth(url, authToken, onComplete, onProgress, headers);
+	=> RestApiGet.GetAssetWithAuth(url, authToken, onComplete, onProgress, headers);
 
 		public static IEnumerator GetAsset(string url, UnityAction<ApiResponse<AssetBundle>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
 			=> RestApiGet.GetAsset(url, onComplete, onProgress, headers);
+
+		public static IEnumerator GetTextWithAuth(string url, string authToken, UnityAction<ApiResponse<string>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+			=> RestApiGet.GetTextWithAuth(url, authToken, onComplete, onProgress, headers);
+
+		public static IEnumerator GetText(string url, UnityAction<ApiResponse<string>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+			=> RestApiGet.GetText(url, onComplete, onProgress, headers);
+
+		public static IEnumerator GetBinaryWithAuth(string url, string authToken, UnityAction<ApiResponse<byte[]>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+			=> RestApiGet.GetBinaryWithAuth(url, authToken, onComplete, onProgress, headers);
+
+		public static IEnumerator GetBinary(string url, UnityAction<ApiResponse<byte[]>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+			=> RestApiGet.GetBinary(url, onComplete, onProgress, headers);
+		#endregion
+
 	}
 }
