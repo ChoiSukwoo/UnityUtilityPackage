@@ -6,12 +6,15 @@ using static Suk.RestApi.RestApiState;
 
 
 
-namespace Suk.RestApi {
-	internal static class RestApiDebug {
-		public static void Request(UnityWebRequest request, Dictionary<string, string> headers) {
+namespace Suk.RestApi
+{
+	internal static class RestApiDebug
+	{
+		public static void Request(UnityWebRequest request, Dictionary<string, string> headers)
+		{
 
 			//출력 거부
-			if(!enableDebugLog)
+			if (!enableDebugLog)
 				return;
 
 			var reqInfo = new StringBuilder();
@@ -21,20 +24,26 @@ namespace Suk.RestApi {
 				.AppendLine($"URL: {request.url}")
 				.AppendLine("Headers:");
 
-			if(headers != null) {
-				foreach(var header in headers)
+			if (headers != null)
+			{
+				foreach (var header in headers)
 					reqInfo.AppendLine($"  {header.Key}: {header.Value}");
-			} else {
+			}
+			else
+			{
 				reqInfo.AppendLine("  No headers provided.");
 			}
 
 			// POST/PUT 요청의 데이터 출력
-			if(request.method == UnityWebRequest.kHttpVerbPOST || request.method == UnityWebRequest.kHttpVerbPUT) {
-				if(request.uploadHandler?.data != null) {
+			if (request.method == UnityWebRequest.kHttpVerbPOST || request.method == UnityWebRequest.kHttpVerbPUT)
+			{
+				if (request.uploadHandler?.data != null)
+				{
 					string bodyData = System.Text.Encoding.UTF8.GetString(request.uploadHandler.data);
-					reqInfo.AppendLine("Body Data:")
-								 .AppendLine(bodyData);
-				} else {
+					reqInfo.AppendLine("Body Data:").AppendLine(bodyData);
+				}
+				else
+				{
 					reqInfo.AppendLine("No body data provided.");
 				}
 			}
@@ -43,10 +52,11 @@ namespace Suk.RestApi {
 		}
 
 
-		public static void Result(UnityWebRequest request, ContentTypeState contentTypeState) {
+		public static void Result(UnityWebRequest request, ContentTypeState contentTypeState)
+		{
 
 			//출력 거부
-			if(!enableDebugLog)
+			if (!enableDebugLog)
 				return;
 
 			var resInfo = new StringBuilder();
@@ -61,21 +71,27 @@ namespace Suk.RestApi {
 
 
 			// 요청 성공 여부 확인
-			if(request.result != UnityWebRequest.Result.Success) {
-				resInfo.AppendLine($"Status: Failure")
-					.AppendLine($"Error: {request.error}");
+			if (request.result != UnityWebRequest.Result.Success)
+			{
+				resInfo.AppendLine($"Status: Failure").AppendLine($"Error: {request.error}");
 				Debug.Log(resInfo.ToString());
 				return; // 실패 시 추가 디버깅 중단
 			}
 
 			resInfo.AppendLine("Status: Success");
-			if(contentTypeState == ContentTypeState.Text) {
+			if (contentTypeState == ContentTypeState.Text)
+			{
 				string jsonResponse = request.downloadHandler.text;
 				resInfo.AppendLine($"Response (Text):\n{jsonResponse}");
-			} else {
-				if(request.downloadedBytes > 0) {
+			}
+			else
+			{
+				if (request.downloadedBytes > 0)
+				{
 					resInfo.AppendLine($"Response ({contentTypeState}): {request.downloadedBytes} bytes (binary)");
-				} else {
+				}
+				else
+				{
 					resInfo.AppendLine($"No {contentTypeState.ToString().ToLower()} data available.");
 				}
 			}

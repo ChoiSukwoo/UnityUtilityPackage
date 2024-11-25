@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Suk.RestApi {
-	public static class RestApi {
+namespace Suk.RestApi
+{
+	public static class RestApi
+	{
 
 		#region Get
 		public static IEnumerator GetJsonWithAuth<T>(string url, string authToken, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
@@ -19,10 +21,10 @@ namespace Suk.RestApi {
 		public static IEnumerator GetTexture(string url, UnityAction<ApiResponse<Texture2D>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
 			=> RestApiGet.GetTexture(url, onComplete, onProgress, headers);
 
-		public static IEnumerator GetAudioWithAuth(string url, string authToken, AudioType audioType = AudioType.MPEG, UnityAction<ApiResponse<AudioClip>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+		public static IEnumerator GetAudioWithAuth(string url, string authToken, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<AudioClip>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
 		=> RestApiGet.GetAudioWithAuth(url, authToken, audioType, onComplete, onProgress, headers);
 
-		public static IEnumerator GetAudio(string url, AudioType audioType = AudioType.MPEG, UnityAction<ApiResponse<AudioClip>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+		public static IEnumerator GetAudio(string url, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<AudioClip>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
 			=> RestApiGet.GetAudio(url, audioType, onComplete, onProgress, headers);
 
 		public static IEnumerator GetVideoWithAuth(string url, string savePath, string authToken, UnityAction<ApiResponse<string>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)

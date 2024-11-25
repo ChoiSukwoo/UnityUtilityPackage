@@ -1,7 +1,9 @@
-namespace Suk.RestApi {
+namespace Suk.RestApi
+{
 
 	//응답용 컨텐츠 타입
-	internal enum ContentTypeState {
+	internal enum ContentTypeState
+	{
 		Unknown = 0,    // 알 수 없는 데이터
 		Text = 1,       // 텍스트 데이터 (JSON, XML, HTML 등)
 		Binary = 2,     // 기타 바이너리 데이터
@@ -12,18 +14,21 @@ namespace Suk.RestApi {
 	}
 
 
-	public enum AudioContentType {
+	public enum AudioContentType
+	{
 		MP3,   // audio/mpeg
 		Wav,    // audio/wav
 		Ogg     // audio/ogg
 	}
 
-	public enum VideoContentType {
+	public enum VideoContentType
+	{
 		Mp4,    // video/mp4
 		Webm    // video/webm
 	}
 
-	public enum ImageContentType {
+	public enum ImageContentType
+	{
 		Png,    // image/png
 		Jpeg    // image/jpeg
 	}
