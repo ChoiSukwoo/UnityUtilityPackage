@@ -16,9 +16,11 @@ namespace Suk.RestApi
 
 	public enum AudioContentType
 	{
-		MP3,   // audio/mpeg
-		Wav,    // audio/wav
-		Ogg     // audio/ogg
+		Unknown = -1, //알수 없음
+		Auto = 0,       // 서버 결정에 맞김
+		MP3 = 1,        // audio/mpeg
+		Wav = 2,        // audio/wav
+		Ogg = 3         // audio/ogg
 	}
 
 	public enum VideoContentType

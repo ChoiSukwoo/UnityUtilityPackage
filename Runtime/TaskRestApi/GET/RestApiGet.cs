@@ -31,7 +31,7 @@ namespace Suk.RestApi
 		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, AudioContentType audioType = AudioContentType.MP3, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await GetAudio(url, audioType, onProgress, SetAuthHeader(headers, authToken), cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudio(string url, AudioContentType audioType = AudioContentType.MP3, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<AudioClip> GetAudio(string url, AudioContentType audioType = AudioContentType.Auto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await Get<AudioClip>(url, onProgress, headers, ContentTypeState.Audio, cancellationToken, audioType);
 
 		public static async UniTask<AssetBundle> GetAssetWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
@@ -40,15 +40,15 @@ namespace Suk.RestApi
 		public static async UniTask<AssetBundle> GetAsset(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await Get<AssetBundle>(url, onProgress, headers, ContentTypeState.Asset, cancellationToken);
 
-		public static async UniTask GetVideoWithAuth(string url, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<string> GetVideoWithAuth(string url, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await GetVideo(url, savePath, onProgress, SetAuthHeader(headers, authToken), cancellationToken);
 
-		public static async UniTask GetVideo(string url, string savePath, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<string> GetVideo(string url, string savePath, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 		{
 			if (string.IsNullOrWhiteSpace(savePath))
 				throw new ArgumentException("Save path cannot be null or empty.");
 			byte[] videoData = await Get<byte[]>(url, onProgress, headers, ContentTypeState.Video, cancellationToken);
-			await HandleVideoResponse(videoData, savePath, cancellationToken);
+			return await HandleVideoResponse(videoData, savePath, cancellationToken);
 		}
 
 		public static async UniTask<string> GetTextWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)

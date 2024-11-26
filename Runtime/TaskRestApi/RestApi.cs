@@ -21,16 +21,16 @@ namespace Suk.RestApi
 		public static async UniTask<Texture2D> GetTexture(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetTexture(url, onProgress, headers, cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, AudioContentType audioType = AudioContentType.MP3, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, AudioContentType audioType = AudioContentType.Auto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetAudioWithAuth(url, authToken, audioType, onProgress, headers, cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudio(string url, AudioContentType audioType = AudioContentType.MP3, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<AudioClip> GetAudio(string url, AudioContentType audioType = AudioContentType.Auto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetAudio(url, audioType, onProgress, headers, cancellationToken);
 
-		public static async UniTask GetVideoWithAuth(string url, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<string> GetVideoWithAuth(string url, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetVideoWithAuth(url, savePath, authToken, onProgress, headers, cancellationToken);
 
-		public static async UniTask GetVideo(string url, string savePath, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<string> GetVideo(string url, string savePath, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetVideo(url, savePath, onProgress, headers, cancellationToken);
 
 		public static async UniTask<AssetBundle> GetAssetWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
@@ -51,6 +51,12 @@ namespace Suk.RestApi
 		public static async UniTask<byte[]> GetBinary(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetBinary(url, onProgress, headers, cancellationToken);
 
+		#endregion
+
+
+		#region Post
+		public static async UniTask<Res> PostJsonForJsonResponse<Req, Res>(string url, Req dto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+			=> await TaskRestApiPostJson.PostJsonForJsonResponse<Req, Res>(url, dto, onProgress, headers, cancellationToken);
 		#endregion
 	}
 }

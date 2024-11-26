@@ -40,22 +40,22 @@ namespace Suk.RestApi
 			yield return HandleAudioSend(audioData, sendAudioType, headers, (bodyData) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, receiveAudioType));
 		}
 
-		/// <summary>비디오 데이터를 POST 요청으로 전송하고 JSON 응답을 처리합니다.</summary>
-		public static IEnumerator PostVideoForAudioResponse<T>(string url, byte[] videoData, VideoContentType videoType, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
-		{
-			yield return HandleVideoSend(videoData, videoType, headers, (bodyData) => Post<string>(url, bodyData, (res) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, audioType)));
-		}
+		///// <summary>비디오 데이터를 POST 요청으로 전송하고 JSON 응답을 처리합니다.</summary>
+		//public static IEnumerator PostVideoForAudioResponse<T>(string url, byte[] videoData, VideoContentType videoType, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+		//{
+		//	yield return HandleVideoSend(videoData, videoType, headers, (bodyData) => Post<string>(url, bodyData, (res) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, audioType)));
+		//}
 
-		/// <summary>이미지 데이터를 POST 요청으로 전송하고 JSON 응답을 처리합니다.</summary>
-		public static IEnumerator PostImageForAudioResponse<T>(string url, byte[] imageData, ImageContentType imageType, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
-		{
-			yield return HandleImageSend(imageData, imageType, headers, (bodyData) => Post<string>(url, bodyData, (res) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, audioType)));
-		}
+		///// <summary>이미지 데이터를 POST 요청으로 전송하고 JSON 응답을 처리합니다.</summary>
+		//public static IEnumerator PostImageForAudioResponse<T>(string url, byte[] imageData, ImageContentType imageType, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+		//{
+		//	yield return HandleImageSend(imageData, imageType, headers, (bodyData) => Post<string>(url, bodyData, (res) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, audioType)));
+		//}
 
-		/// <summary>멀티파트 데이터를 POST 요청으로 전송하고 JSON 응답을 처리합니다.</summary>
-		public static IEnumerator PostMultipartForAudioResponse<T>(string url, MultipartFormData multipartData, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
-		{
-			yield return HandleMultipartSend(multipartData, headers, (bodyData) => Post<string>(url, bodyData, (res) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, audioType)));
-		}
+		///// <summary>멀티파트 데이터를 POST 요청으로 전송하고 JSON 응답을 처리합니다.</summary>
+		//public static IEnumerator PostMultipartForAudioResponse<T>(string url, MultipartFormData multipartData, AudioContentType audioType = AudioContentType.MP3, UnityAction<ApiResponse<T>> onComplete = null, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null)
+		//{
+		//	yield return HandleMultipartSend(multipartData, headers, (bodyData) => Post<string>(url, bodyData, (res) => Post(url, bodyData, onComplete, onProgress, headers, ContentTypeState.Audio, audioType)));
+		//}
 	}
 }
