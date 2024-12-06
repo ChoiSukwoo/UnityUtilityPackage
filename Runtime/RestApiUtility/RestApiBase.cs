@@ -122,8 +122,6 @@ namespace Suk.RestApi
 			}
 		}
 
-
-
 		public static async UniTask<T> Post<T>(string url, byte[] bodyData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, ContentTypeState expectedType = ContentTypeState.Unknown, CancellationToken cancellationToken = default, AudioContentType audioType = AudioContentType.MP3)
 		{
 			using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))

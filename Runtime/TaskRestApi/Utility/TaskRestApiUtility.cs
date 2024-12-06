@@ -228,14 +228,14 @@ namespace Suk.RestApi
 		}
 
 		/// <summary> Text를 바이트 배열로 변환하여 반환합니다. </summary>
-		public static byte[] HandleTextBody(string text, string contentType, Dictionary<string, string> headers)
+		public static byte[] HandleTextBody(string text)
 		{
 			byte[] bodyData = Encoding.UTF8.GetBytes(text);
 			return bodyData;
 		}
 
 		/// <summary> JSON를 바이트 배열로 변환하여 반환합니다. </summary>
-		public static byte[] HandleJsonBody<T>(T body, Dictionary<string, string> headers)
+		public static byte[] HandleJsonBody<T>(T body)
 		{
 			if (body == null)
 				throw new ArgumentNullException(nameof(body), "[RestApiUtility] HandleJsonBody\nBody 객체가 null입니다.");
