@@ -1,5 +1,7 @@
-namespace Suk.RestApi {
-	internal static class RestApiState {
+namespace Suk.RestApi
+{
+	internal static class RestApiState
+	{
 		//디버그 출력 여부
 		public static bool enableDebugLog = true;
 		//진행 디버그 출력을위한 최소 주기

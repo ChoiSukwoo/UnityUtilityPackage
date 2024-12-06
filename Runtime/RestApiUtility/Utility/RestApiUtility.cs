@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using Suk.Json;
 using UnityEngine;
@@ -15,15 +14,99 @@ namespace Suk.RestApi
 	internal static class RestApiUtility
 	{
 
-		public static Dictionary<string, string> SetAuthHeader(Dictionary<string, string> headers, string authToken)
+		#region MediaTypeConvert
+		/// <summary> AudioContentType에서 Content-Type을 추출합니다. </summary>
+		public static string GetContentTypeFromAudioContentType(AudioContentType contentType)
 		{
-			if (headers == null)
-				headers = new Dictionary<string, string>();
-			headers["Authorization"] = $"Bearer {authToken}";
-			return headers;
+			if (RestApiModel.AudioContentTypeToContentType.TryGetByKey(contentType, out string type))
+				return type;
+
+			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromAudioContentType\nUnsupported AudioContentType: {contentType}");
 		}
 
+		/// <summary> Content-Type에서 AudioContentType을 추출합니다. </summary>
+		public static AudioContentType GetAudioContentTypeFromContentType(string contentType)
+		{
+			if (RestApiModel.AudioContentTypeToContentType.TryGetByValue(contentType, out AudioContentType audioContentType))
+				return audioContentType;
 
+			return AudioContentType.Unknown;
+		}
+
+		/// <summary> AudioContentType에서 Unity AudioType을 추출합니다. </summary>
+		public static AudioType GetAudioTypeFromAudioContentType(AudioContentType contentType)
+		{
+			if (RestApiModel.AudioContentTypeToAudioType.TryGetByKey(contentType, out AudioType audioType))
+				return audioType;
+
+			return AudioType.UNKNOWN;
+		}
+
+		/// <summary> Unity AudioType에서 AudioContentType을 추출합니다. </summary>
+		public static AudioContentType GetAudioContentTypeFromAudioType(AudioType audioType)
+		{
+			if (RestApiModel.AudioContentTypeToAudioType.TryGetByValue(audioType, out AudioContentType contentType))
+				return contentType;
+
+			return AudioContentType.Unknown;
+		}
+
+		/// <summary> Content-Type에서 Unity AudioType을 추출합니다. </summary>
+		public static AudioType GetAudioTypeFromContentType(string contentType)
+		{
+			if (RestApiModel.ContentTypeToAudioType.TryGetByKey(contentType, out AudioType audioType))
+				return audioType;
+
+			return AudioType.UNKNOWN;
+		}
+
+		/// <summary> Unity AudioType에서 Content-Type을 추출합니다. </summary>
+		public static string GetContentTypeFromAudioType(AudioType audioType)
+		{
+			if (RestApiModel.ContentTypeToAudioType.TryGetByValue(audioType, out string contentType))
+				return contentType;
+
+			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromAudioType\nUnsupported Unity AudioType: {audioType}");
+		}
+
+		/// <summary> VideoContentType에서 Content-Type(MIME Type)을 추출합니다. </summary>
+		public static string GetContentTypeFromVideoContentType(VideoContentType contentType)
+		{
+			if (RestApiModel.VideoContentTypeToContentType.TryGetByKey(contentType, out string type))
+				return type;
+
+			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromVideoContentType\nUnsupported VideoContentType: {contentType}");
+		}
+
+		/// <summary> Content-Type(MIME Type)에서 VideoContentType을 추출합니다. </summary>
+		public static VideoContentType GetVideoContentTypeFromContentType(string contentType)
+		{
+			if (RestApiModel.VideoContentTypeToContentType.TryGetByValue(contentType, out VideoContentType videoContentType))
+				return videoContentType;
+
+			return VideoContentType.Unknown;
+		}
+
+		/// <summary> ImageContentType에서 Content-Type(MIME Type)을 추출합니다. </summary>
+		public static string GetContentTypeFromImageContentType(ImageContentType contentType)
+		{
+			if (RestApiModel.ImageContentTypeToContentType.TryGetByKey(contentType, out string type))
+				return type;
+
+			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromImageContentType\nUnsupported ImageContentType: {contentType}");
+		}
+
+		/// <summary> Content-Type(MIME Type)에서 ImageContentType을 추출합니다. </summary>
+		public static ImageContentType GetImageContentTypeFromContentType(string contentType)
+		{
+			if (RestApiModel.ImageContentTypeToContentType.TryGetByValue(contentType, out ImageContentType imageContentType))
+				return imageContentType;
+
+			return ImageContentType.Unknown;
+		}
+		#endregion
+
+		#region Old
 		//인증 토큰 헤더
 		public static void SetAuthHeader(ref Dictionary<string, string> headers, string authToken)
 		{
@@ -37,114 +120,6 @@ namespace Suk.RestApi
 			if (headers == null)
 				headers = new Dictionary<string, string>();
 			headers["Content-Type"] = contentType;
-		}
-
-		//헤더 설정
-		public static void SetRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
-		{
-			if (headers != null)
-			{
-				foreach ((string key, string value) in headers)
-				{
-					request.SetRequestHeader(key, value);
-				}
-			}
-		}
-
-		public static DownloadHandler CreateDownloadHandler(string url, ContentTypeState expectedType, AudioContentType audioContentType, uint crc = 0)
-		{
-			switch (expectedType)
-			{
-				case ContentTypeState.Audio:
-					AudioType audioType = ConvertToUnityAudioType(audioContentType);
-					return new DownloadHandlerAudioClip(url, audioType);
-				case ContentTypeState.Image:
-					return new DownloadHandlerTexture();
-				case ContentTypeState.Asset:
-					return new DownloadHandlerAssetBundle(url, crc);
-				default:
-					return new DownloadHandlerBuffer(); // 기본 핸들러
-			}
-		}
-
-
-		// Content-Type 유효성 검사 함수
-		public static bool ValidateContentType(UnityWebRequest request, ref ContentTypeState expectedType)
-		{
-			if (expectedType == ContentTypeState.Unknown)
-			{
-				string contentType = request.GetResponseHeader("Content-Type");
-				if (!TryParseContentType(contentType, out expectedType))
-				{
-					RestApiDebug.Result(request, expectedType);
-					return false;
-				}
-			}
-			return true;
-		}
-
-		public static T ParseResponse<T>(UnityWebRequest request, ContentTypeState expectedType)
-		{
-			switch (expectedType)
-			{
-				case ContentTypeState.Image:
-					return (T)(object)DownloadHandlerTexture.GetContent(request);
-				case ContentTypeState.Audio:
-					return (T)(object)DownloadHandlerAudioClip.GetContent(request);
-				case ContentTypeState.Asset:
-					return (T)(object)DownloadHandlerAssetBundle.GetContent(request);
-				case ContentTypeState.Text:
-					return (T)(object)request.downloadHandler.text;
-				case ContentTypeState.Binary:
-				case ContentTypeState.Video:
-					return (T)(object)request.downloadHandler.data;
-				default:
-					throw new Exception("Unsupported content type.");
-			}
-		}
-
-		// ContentType 파싱 메서드
-		public static bool TryParseContentType(string contentType, out ContentTypeState contentTypeId)
-		{
-			contentTypeId = ContentTypeState.Unknown;
-
-			//contentType을 알수 없음
-			if (string.IsNullOrEmpty(contentType))
-				return false;
-
-			// Content-Type의 메인 타입 파싱
-			string mainType = contentType.Split(';')[0].Trim().ToLower();
-
-			if (mainType.StartsWith("text/") || mainType.Contains("json") || mainType.Contains("xml"))
-			{
-				contentTypeId = ContentTypeState.Text;
-				return true;
-			}
-			else if (mainType.StartsWith("image/"))
-			{
-				contentTypeId = ContentTypeState.Image;
-				return true;
-			}
-			else if (mainType.StartsWith("video/"))
-			{
-				contentTypeId = ContentTypeState.Video;
-				return true;
-			}
-			else if (mainType.StartsWith("audio/"))
-			{
-				contentTypeId = ContentTypeState.Audio;
-				return true;
-			}
-			else if (mainType.StartsWith("application/octet-stream") || mainType.Contains("assetbundle"))
-			{
-				contentTypeId = ContentTypeState.Asset;
-				return true;
-			}
-			else
-			{
-				contentTypeId = ContentTypeState.Binary;
-				return true;
-			}
 		}
 
 		//1%이상 증가하거나 1초가 지날시 
@@ -167,85 +142,12 @@ namespace Suk.RestApi
 			onProgress?.Invoke(1f);
 		}
 
-		public static async UniTask UpdateProgress(UnityWebRequestAsyncOperation asyncOperation, UnityAction<float> progress = null, CancellationToken token = default)
-		{
-			float lastProgress = 0f;
-			float lastProgressUpdate = Time.time;
-
-			while (!asyncOperation.isDone)
-			{
-				if (Time.time >= lastProgressUpdate + minUpdateInterval || Mathf.Abs(asyncOperation.progress - lastProgress) >= minProgressChange)
-				{
-					progress?.Invoke(asyncOperation.progress); // 진행률 업데이트
-					lastProgress = asyncOperation.progress;
-					lastProgressUpdate = Time.time;
-				}
-				await UniTask.Yield(PlayerLoopTiming.Update, token); // 프레임 대기 (취소 토큰 지원)
-			}
-
-			progress?.Invoke(1f);
-		}
-
-		/// <summary>AudioContentType을 기반으로 MIME 타입을 반환합니다.</summary>
-		/// <param name="contentType">오디오 콘텐츠 타입</param>
-		/// <returns>해당 콘텐츠 타입의 MIME 타입</returns>
-		public static string GetAudioMimeType(AudioContentType contentType)
-		{
-			return contentType switch
-			{
-				AudioContentType.MP3 => "audio/mpeg",
-				AudioContentType.Wav => "audio/wav",
-				AudioContentType.Ogg => "audio/ogg",
-				_ => throw new NotSupportedException($"Unsupported Audio Content-Type: {contentType}")
-			};
-		}
-
-		/// <summary> AudioContentType을 Unity의 AudioType으로 변환합니다.</summary>
-		/// <param name="contentType">오디오 콘텐츠 타입</param>
-		/// <returns>Unity AudioType에 매핑된 값</returns>
-		public static AudioType ConvertToUnityAudioType(AudioContentType contentType)
-		{
-			return contentType switch
-			{
-				AudioContentType.MP3 => AudioType.MPEG,
-				AudioContentType.Wav => AudioType.WAV,
-				AudioContentType.Ogg => AudioType.OGGVORBIS,
-				_ => AudioType.UNKNOWN // 지원되지 않는 타입은 UNKNOWN으로 처리
-			};
-		}
-
-
-		public static string GetVideoMimeType(VideoContentType contentType)
-		{
-			return contentType switch
-			{
-				VideoContentType.Mp4 => "video/mp4",
-				VideoContentType.Webm => "video/webm",
-				_ => throw new NotSupportedException($"Unsupported Video Content-Type: {contentType}")
-			};
-		}
-
-		public static string GetImageMimeType(ImageContentType contentType)
-		{
-			return contentType switch
-			{
-				ImageContentType.Png => "image/png",
-				ImageContentType.Jpeg => "image/jpeg",
-				_ => throw new NotSupportedException($"Unsupported Image Content-Type: {contentType}")
-			};
-		}
-
 		public static IEnumerator ExecuteWithAuth(string authToken, Dictionary<string, string> headers, Func<IEnumerator> execute)
 		{
 			SetAuthHeader(ref headers, authToken);
 			yield return execute();
 		}
 
-		public static async UniTask ExecuteWithAuth(string authToken, Dictionary<string, string> headers, Func<UniTask> execute)
-		{
-			SetAuthHeader(ref headers, authToken); // 인증 헤더 설정
-			await execute(); // 비동기 작업 실행
-		}
 
 		public static void HandleJsonResponse<T>(ApiResponse<string> apiResponse, UnityAction<ApiResponse<T>> onComplete = null)
 		{
@@ -267,19 +169,6 @@ namespace Suk.RestApi
 		}
 
 
-		public static T HandleJsonResponse<T>(string jsonResponse)
-		{
-			try
-			{
-				var parsedData = JsonParser.Parse<T>(jsonResponse);
-				return parsedData;
-			}
-			catch (Exception ex)
-			{
-				throw new Exception($"JSON 파싱 오류: {ex.Message}");
-			}
-		}
-
 		public static void HandleVideoResponse(ApiResponse<byte[]> apiResponse, string savePath, UnityAction<ApiResponse<string>> onComplete = null)
 		{
 			if (!apiResponse.Success)
@@ -300,33 +189,6 @@ namespace Suk.RestApi
 			}
 		}
 
-		/// <summary>
-		/// 비디오 데이터를 파일로 저장하고 저장 경로를 반환하는 함수.
-		/// </summary>
-		/// <param name="videoData">비디오 데이터 (byte 배열)</param>
-		/// <param name="savePath">비디오를 저장할 경로</param>
-		/// <returns>비디오가 저장된 경로</returns>
-		public static async UniTask<string> HandleVideoResponse(byte[] videoData, string savePath, CancellationToken cancellationToken = default)
-		{
-			if (videoData == null || videoData.Length == 0)
-				throw new ArgumentException("Video data is null or empty.");
-
-			if (string.IsNullOrWhiteSpace(savePath))
-				throw new ArgumentException("Save path cannot be null or empty.");
-
-			try
-			{
-				// 비동기로 파일 쓰기
-				await UniTask.RunOnThreadPool(() => File.WriteAllBytes(savePath, videoData));
-				Debug.Log($"Video saved at: {savePath}");
-				return savePath; // 성공 시 저장 경로 반환
-			}
-			catch (Exception ex)
-			{
-				throw new IOException($"Failed to save video: {ex.Message}", ex);
-			}
-		}
-
 		public static string HandleVideoResponse(byte[] videoData, string savePath)
 		{
 			try
@@ -344,19 +206,11 @@ namespace Suk.RestApi
 		}
 
 
-
 		public static IEnumerator HandleNoneSend(Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
 			byte[] bodyData = new byte[0]; // 빈 데이터
 			yield return execute(bodyData);
 		}
-
-		public static async UniTask HandleNoneSend(Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			byte[] bodyData = new byte[0]; // 빈 데이터
-			await execute(bodyData);
-		}
-
 
 		public static IEnumerator HandleTextSend(string text, string contentType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
@@ -365,24 +219,10 @@ namespace Suk.RestApi
 			yield return execute(bodyData);
 		}
 
-		public static async UniTask HandleTextSend(string text, string contentType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			SetContentHeader(ref headers, contentType);
-			byte[] bodyData = System.Text.Encoding.UTF8.GetBytes(text);
-			await execute(bodyData);
-		}
-
-
 		public static IEnumerator HandleBinarySend(byte[] binaryData, string contentType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
 			SetContentHeader(ref headers, contentType);
 			yield return execute(binaryData);
-		}
-
-		public static async UniTask HandleBinarySend(byte[] binaryData, string contentType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			SetContentHeader(ref headers, contentType);
-			await execute(binaryData);
 		}
 
 		public static IEnumerator HandleJsonSend<T>(T body, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
@@ -392,60 +232,53 @@ namespace Suk.RestApi
 			yield return execute(bodyData);
 		}
 
-		public static async UniTask HandleJsonSend<T>(T body, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			SetContentHeader(ref headers, "application/json");
-			byte[] bodyData = JsonParser.ToByteArray(body);
-			await execute(bodyData);
-		}
-
 		public static IEnumerator HandleAudioSend(byte[] audioData, AudioContentType audioType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
-			string contentType = GetAudioMimeType(audioType); // AudioContentType에 따라 MIME 타입 결정
+			string contentType = GetContentTypeFromAudioContentType(audioType); // AudioContentType에 따라 MIME 타입 결정
 			SetContentHeader(ref headers, contentType); // 헤더 설정
 			yield return execute(audioData); // 준비된 데이터를 다음 단계로 전달
 		}
 
-		public static async UniTask HandleAudioSend(byte[] audioData, AudioContentType audioType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			string contentType = GetAudioMimeType(audioType); // AudioContentType에 따라 MIME 타입 결정
-			SetContentHeader(ref headers, contentType); // 헤더 설정
-			await execute(audioData);
-		}
-
 		public static IEnumerator HandleVideoSend(byte[] videoData, VideoContentType videoType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
-			string contentType = GetVideoMimeType(videoType);
+			string contentType = GetContentTypeFromVideoContentType(videoType);
 			SetContentHeader(ref headers, contentType);
 			yield return execute(videoData);
 		}
 
-		public static async UniTask HandleVideoSend(byte[] videoData, VideoContentType videoType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			string contentType = GetVideoMimeType(videoType);
-			SetContentHeader(ref headers, contentType);
-			await execute(videoData);
-		}
-
-
 		public static IEnumerator HandleImageSend(byte[] imageData, ImageContentType imageType, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
-			string contentType = GetImageMimeType(imageType);
+			string contentType = GetContentTypeFromImageContentType(imageType);
 			SetContentHeader(ref headers, contentType);
 			yield return execute(imageData);
 		}
 
-		public static async UniTask HandleImageSend(byte[] imageData, ImageContentType imageType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
-		{
-			string contentType = GetImageMimeType(imageType);
-			SetContentHeader(ref headers, contentType);
-			await execute(imageData);
-		}
 		public static IEnumerator HandleMultipartSend(MultipartFormData multipartData, Dictionary<string, string> headers, Func<byte[], IEnumerator> execute)
 		{
 			SetContentHeader(ref headers, $"multipart/form-data; boundary={multipartData.Boundary}");
 			byte[] bodyData = multipartData.ToBytes();
 			yield return execute(bodyData);
+		}
+
+		public static async UniTask HandleAudioSend(byte[] audioData, AudioContentType audioType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
+		{
+			string contentType = GetContentTypeFromAudioContentType(audioType); // AudioContentType에 따라 MIME 타입 결정
+			SetContentHeader(ref headers, contentType); // 헤더 설정
+			await execute(audioData);
+		}
+
+		public static async UniTask HandleVideoSend(byte[] videoData, VideoContentType videoType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
+		{
+			string contentType = GetContentTypeFromVideoContentType(videoType);
+			SetContentHeader(ref headers, contentType);
+			await execute(videoData);
+		}
+
+		public static async UniTask HandleImageSend(byte[] imageData, ImageContentType imageType, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
+		{
+			string contentType = GetContentTypeFromImageContentType(imageType);
+			SetContentHeader(ref headers, contentType);
+			await execute(imageData);
 		}
 
 		public static async UniTask HandleMultipartSend(MultipartFormData multipartData, Dictionary<string, string> headers, Func<byte[], UniTask> execute)
@@ -454,9 +287,6 @@ namespace Suk.RestApi
 			byte[] bodyData = multipartData.ToBytes();
 			await execute(bodyData);
 		}
-
-		//GetBase
-
-
+		#endregion
 	}
 }

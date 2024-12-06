@@ -6,62 +6,13 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using static Suk.RestApi.RestApiUtility;
+using static Suk.RestApi.TaskRestApiUtility;
 
 
 namespace Suk.RestApi
 {
 	internal static class RestApiBase
 	{
-
-		public static IEnumerator Get<T>(string url, UnityAction<ApiResponse<T>> onComplete, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, ContentTypeState expectedType = ContentTypeState.Unknown, AudioContentType audioContentType = AudioContentType.MP3)
-		{
-			using (UnityWebRequest request = UnityWebRequest.Get(url))
-			{
-				// 1. 헤더 설정
-				SetRequestHeaders(request, headers);
-
-				// 2. 다운로드 핸들러 설정
-				request.downloadHandler = CreateDownloadHandler(url, expectedType, audioContentType);
-
-				// 3. 전송 상태를 사용자에게 알림
-				RestApiDebug.Request(request, headers);
-
-				// 4. 요청 시작 및 전송 상태 추적
-				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
-				yield return UpdateProgress(asyncOperation, onProgress);
-
-				// 5. 요청 후 Content-Type 확인 (expectedType이 Unknown일 경우)
-				if (!ValidateContentType(request, ref expectedType))
-				{
-					string contentType = request.GetResponseHeader("Content-Type");
-					onComplete?.Invoke(new FailureResponse<T>($"Unrecognized or missing Content-Type: {contentType}"));
-					yield break;
-				}
-
-				// 6. 결과 출력
-				RestApiDebug.Result(request, expectedType);
-
-				// 7. 요청 성공 여부 확인
-				if (request.result != UnityWebRequest.Result.Success)
-				{
-					onComplete?.Invoke(new FailureResponse<T>(request.error));
-					yield break;
-				}
-
-				// 8. 응답 처리 및 성공/실패 처리
-				try
-				{
-					T response = ParseResponse<T>(request, expectedType);
-					onComplete?.Invoke(new SuccessResponse<T>(response));
-				}
-				catch (System.Exception ex)
-				{
-					onComplete?.Invoke(new FailureResponse<T>($"Failed to parse response: {ex.Message}"));
-				}
-			}
-		}
-
-
 		/// <summary>
 		/// 비동기적으로 HTTP GET 요청을 수행하는 유틸리티 함수.
 		/// UnityWebRequest를 사용하며 UniTask를 기반으로 요청 진행률, 헤더 설정, 콘텐츠 유형 검증 및 응답 처리 기능을 제공합니다.
@@ -79,7 +30,7 @@ namespace Suk.RestApi
 		/// <param name="audioType">오디오 데이터인 경우의 AudioType (기본값: AudioType.UNKNOWN)</param>
 		/// <param name="cancellationToken">요청을 취소하기 위한 CancellationToken (옵션)</param>
 		/// <returns>응답 데이터를 지정된 타입으로 반환하는 UniTask</returns>
-		public static async UniTask<T> Get<T>(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, ContentTypeState expectedType = ContentTypeState.Unknown, CancellationToken cancellationToken = default, AudioContentType audioContentType = AudioContentType.Auto)
+		public static async UniTask<T> Get<T>(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, ContentTypeState expectedType = ContentTypeState.Unknown, CancellationToken cancellationToken = default)
 		{
 			using (UnityWebRequest request = UnityWebRequest.Get(url))
 			{
@@ -87,7 +38,7 @@ namespace Suk.RestApi
 				SetRequestHeaders(request, headers);
 
 				// 2. 다운로드 핸들러 설정
-				request.downloadHandler = CreateDownloadHandler(url, expectedType, audioContentType);
+				request.downloadHandler = CreateDownloadHandler(url, expectedType);
 
 				// 3. 전송 상태를 디버깅 로그에 출력
 				RestApiDebug.Request(request, headers);
@@ -96,14 +47,17 @@ namespace Suk.RestApi
 				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
 				await UpdateProgress(asyncOperation, onProgress, cancellationToken);
 
+				//콘텐츠 타입 추출
+				string contentType = request.GetResponseHeader("Content-Type");
+
 				// 5. 요청 후 Content-Type 확인
 				if (!ValidateContentType(request, ref expectedType))
 				{
-					string contentType = request.GetResponseHeader("Content-Type");
+					RestApiDebug.Result(request, ContentTypeState.Unknown);
 					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
-				// 6. 요청 결과 확인
+				// 6. 요청 결과를 디버깅 로그에 출력
 				RestApiDebug.Result(request, expectedType);
 
 				// 7. 실패 처리
@@ -111,7 +65,9 @@ namespace Suk.RestApi
 					throw new Exception($"Request failed: {request.error}");
 
 				// 8. 응답 처리 및 반환
-				return ParseResponse<T>(request, expectedType);
+				T result = await ParseResponse<T>(request, expectedType, contentType);
+
+				return result;
 			}
 		}
 
@@ -126,7 +82,7 @@ namespace Suk.RestApi
 				request.uploadHandler = new UploadHandlerRaw(bodyData);
 
 				// 3. 다운로드 핸들러 설정
-				request.downloadHandler = CreateDownloadHandler(url, expectedType, audioType);
+				//request.downloadHandler = CreateDownloadHandler(url, expectedType, audioType);
 
 				// 4. 전송 상태를 사용자에게 알림
 				RestApiDebug.Request(request, headers);
@@ -156,8 +112,8 @@ namespace Suk.RestApi
 				// 9. 응답 처리 및 성공/실패 처리
 				try
 				{
-					T response = ParseResponse<T>(request, expectedType);
-					onComplete?.Invoke(new SuccessResponse<T>(response));
+					//T response = ParseResponse<T>(request, expectedType);
+					//onComplete?.Invoke(new SuccessResponse<T>(response));
 				}
 				catch (System.Exception ex)
 				{
@@ -179,7 +135,7 @@ namespace Suk.RestApi
 				request.uploadHandler = new UploadHandlerRaw(bodyData);
 
 				// 3. 다운로드 핸들러 설정
-				request.downloadHandler = CreateDownloadHandler(url, expectedType, audioType);
+				request.downloadHandler = CreateDownloadHandler(url, expectedType);
 
 				// 4. 전송 상태를 사용자에게 알림
 				RestApiDebug.Request(request, headers);
@@ -188,10 +144,11 @@ namespace Suk.RestApi
 				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
 				await UpdateProgress(asyncOperation, onProgress, cancellationToken);
 
+				string contentType = request.GetResponseHeader("Content-Type");
+
 				// 5. 요청 후 Content-Type 확인
 				if (!ValidateContentType(request, ref expectedType))
 				{
-					string contentType = request.GetResponseHeader("Content-Type");
 					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
@@ -203,7 +160,7 @@ namespace Suk.RestApi
 					throw new Exception($"Request failed: {request.error}");
 
 				// 8. 응답 처리 및 반환
-				return ParseResponse<T>(request, expectedType);
+				return await ParseResponse<T>(request, expectedType, contentType);
 			}
 		}
 

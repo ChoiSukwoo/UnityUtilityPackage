@@ -21,11 +21,11 @@ namespace Suk.RestApi
 		public static async UniTask<Texture2D> GetTexture(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetTexture(url, onProgress, headers, cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, AudioContentType audioType = AudioContentType.Auto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
-			=> await TaskRestApiGet.GetAudioWithAuth(url, authToken, audioType, onProgress, headers, cancellationToken);
+		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+			=> await TaskRestApiGet.GetAudioWithAuth(url, authToken, onProgress, headers, cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudio(string url, AudioContentType audioType = AudioContentType.Auto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
-			=> await TaskRestApiGet.GetAudio(url, audioType, onProgress, headers, cancellationToken);
+		public static async UniTask<AudioClip> GetAudio(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+			=> await TaskRestApiGet.GetAudio(url, onProgress, headers, cancellationToken);
 
 		public static async UniTask<string> GetVideoWithAuth(string url, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await TaskRestApiGet.GetVideoWithAuth(url, savePath, authToken, onProgress, headers, cancellationToken);

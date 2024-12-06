@@ -6,7 +6,7 @@ using Suk.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using static Suk.RestApi.RestApiBase;
-using static Suk.RestApi.RestApiUtility;
+using static Suk.RestApi.TaskRestApiUtility;
 
 namespace Suk.RestApi
 {
@@ -28,11 +28,11 @@ namespace Suk.RestApi
 		public static async UniTask<Texture2D> GetTexture(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await Get<Texture2D>(url, onProgress, headers, ContentTypeState.Image, cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, AudioContentType audioType = AudioContentType.MP3, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
-			=> await GetAudio(url, audioType, onProgress, SetAuthHeader(headers, authToken), cancellationToken);
+		public static async UniTask<AudioClip> GetAudioWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+			=> await GetAudio(url, onProgress, SetAuthHeader(headers, authToken), cancellationToken);
 
-		public static async UniTask<AudioClip> GetAudio(string url, AudioContentType audioType = AudioContentType.Auto, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
-			=> await Get<AudioClip>(url, onProgress, headers, ContentTypeState.Audio, cancellationToken, audioType);
+		public static async UniTask<AudioClip> GetAudio(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+			=> await Get<AudioClip>(url, onProgress, headers, ContentTypeState.Audio, cancellationToken);
 
 		public static async UniTask<AssetBundle> GetAssetWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await GetAsset(url, onProgress, SetAuthHeader(headers, authToken), cancellationToken);
