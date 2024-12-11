@@ -39,7 +39,7 @@ namespace Suk.RestApi
 			{
 				if (request.uploadHandler?.data != null)
 				{
-					string bodyData = System.Text.Encoding.UTF8.GetString(request.uploadHandler.data);
+					string bodyData = Encoding.UTF8.GetString(request.uploadHandler.data);
 					reqInfo.AppendLine("Body Data:").AppendLine(bodyData);
 				}
 				else
@@ -50,7 +50,6 @@ namespace Suk.RestApi
 
 			Debug.Log(reqInfo.ToString()); // 응답 정보 로그 한 번 출력
 		}
-
 
 		public static void Result(UnityWebRequest request, ContentTypeState contentTypeState)
 		{
@@ -98,8 +97,5 @@ namespace Suk.RestApi
 
 			Debug.Log(resInfo.ToString()); // 응답 정보 로그 한 번 출력
 		}
-
-
-
 	}
 }

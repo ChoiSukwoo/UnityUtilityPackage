@@ -13,7 +13,7 @@ using static Suk.RestApi.RestApiState;
 
 namespace Suk.RestApi
 {
-	internal static class TaskRestApiUtility
+	internal static class RestApiUtility
 	{
 		/// <summary> 인증 토큰을 설정한 새 헤더를 반환합니다 </summary>
 		public static Dictionary<string, string> SetAuthHeader(Dictionary<string, string> headers, string authToken)
@@ -138,11 +138,11 @@ namespace Suk.RestApi
 			}
 			catch (InvalidCastException ex)
 			{
-				throw new InvalidCastException($"[RestApiUtility] ParseResponse\n{ex.Message}", ex);
+				throw new InvalidCastException($"ParseResponse\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"[RestApiUtility] ParseResponse\n알 수 없는 에러 발생: {ex.Message}", ex);
+				throw new Exception($"ParseResponse\n알 수 없는 에러 발생: {ex.Message}", ex);
 			}
 		}
 
@@ -169,16 +169,47 @@ namespace Suk.RestApi
 			}
 			catch (OperationCanceledException)
 			{
-				throw new OperationCanceledException("[RestApiUtility] UpdateProgress\nAPI를 통한 데이터 다운로드 작업이 취소되었습니다.", token);
+				throw new OperationCanceledException("UpdateProgress Error : API를 통한 데이터 다운로드 작업이 취소되었습니다.", token);
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"[RestApiUtility] UpdateProgress\nAPI를 통한 데이터 다운로드 작업 중 오류 발생: {ex.Message}", ex);
+				throw new Exception($"UpdateProgress Error : API를 통한 데이터 다운로드 작업 중 오류 발생\n {ex.Message}", ex);
 			}
 
 			progress?.Invoke(1f);
 		}
 
+
+		#region DataConvert
+		public static byte[] ConvertTextToBytes(string text)
+		{
+			return Encoding.UTF8.GetBytes(text);
+		}
+
+		public static byte[] ConvertDictionaryToBytes(Dictionary<string, string> body)
+		{
+			// 단계 2: FormData 변환
+			if (body == null || body.Count == 0)
+				throw new ArgumentException("Form data cannot be null or empty.");
+
+			// Key-Value 쌍을 인코딩하여 List<string>에 저장
+			List<string> encodedDataParts = new List<string>();
+			foreach (KeyValuePair<string, string> kvp in body)
+			{
+				string encodedKey = Uri.EscapeDataString(Convert.ToString(kvp.Key ?? string.Empty));
+				string encodedValue = Uri.EscapeDataString(Convert.ToString(kvp.Value ?? string.Empty));
+				encodedDataParts.Add($"{encodedKey}={encodedValue}");
+			}
+
+			// 조합된 문자열을 생성
+			string encodedDataString = string.Join("&", encodedDataParts);
+
+			// UTF8 바이트 배열로 변환
+			return Encoding.UTF8.GetBytes(encodedDataString);
+		}
+		#endregion
+
+		#region Handler
 		/// <summary> JSON 응답 데이터를 지정된 제네릭 타입으로 파싱합니다. </summary>
 		public static T HandleJsonResponse<T>(string jsonResponse)
 		{
@@ -189,7 +220,7 @@ namespace Suk.RestApi
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"[RestApiUtility] HandleJsonResponse\n {ex.Message}", ex);
+				throw new Exception($"HandleJsonResponse\n {ex.Message}", ex);
 			}
 		}
 
@@ -197,10 +228,9 @@ namespace Suk.RestApi
 		public static async UniTask<string> HandleVideoResponse(byte[] videoData, string savePath, CancellationToken cancellationToken = default)
 		{
 			if (videoData == null || videoData.Length == 0)
-				throw new ArgumentException("[RestApiUtility] HandleVideoResponse\nVideo data is null or empty.");
+				throw new ArgumentException("HandleVideoResponse Error : Video data is null or empty.");
 
-			if (string.IsNullOrWhiteSpace(savePath))
-				throw new ArgumentException("[RestApiUtility] HandleVideoResponse\nSave path cannot be null or empty.");
+			ValidatePath(savePath);
 
 			try
 			{
@@ -220,20 +250,6 @@ namespace Suk.RestApi
 			}
 		}
 
-		/// <summary> 데이터 전송이 필요 없는 요청을 처리합니다. </summary>
-		public static byte[] HandleNoneBody()
-		{
-			byte[] bodyData = new byte[0]; // 빈 데이터
-			return bodyData;
-		}
-
-		/// <summary> Text를 바이트 배열로 변환하여 반환합니다. </summary>
-		public static byte[] HandleTextBody(string text)
-		{
-			byte[] bodyData = Encoding.UTF8.GetBytes(text);
-			return bodyData;
-		}
-
 		/// <summary> JSON를 바이트 배열로 변환하여 반환합니다. </summary>
 		public static byte[] HandleJsonBody<T>(T body)
 		{
@@ -243,13 +259,7 @@ namespace Suk.RestApi
 			byte[] bodyData = JsonParser.ToByteArray(body);
 			return bodyData;
 		}
-
-		/// <summary> MultipartFormData를 바이트 배열로 변환하여 반환합니다. </summary>
-		public static byte[] HandleMultipartBody(MultipartFormData multipartData)
-		{
-			byte[] bodyData = multipartData.ToBytes();
-			return bodyData;
-		}
+		#endregion
 
 		#region MediaTypeConvert
 		/// <summary> AudioContentType에서 Content-Type을 추출합니다. </summary>
@@ -342,5 +352,57 @@ namespace Suk.RestApi
 			return ImageContentType.Unknown;
 		}
 		#endregion
+
+		#region Validate
+
+		/// <summary>URL 유효성 검사</summary>
+		public static void ValidateUrl(string url)
+		{
+			if (string.IsNullOrWhiteSpace(url))
+				throw new ArgumentNullException(nameof(url), "URL이 null이거나 비어 있습니다.");
+			if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+				throw new ArgumentException("유효하지 않은 URL 형식입니다.", nameof(url));
+		}
+
+		/// <summary>Content-Type 유효성 검사</summary>
+		public static void ValidateContentType(string contentType)
+		{
+			if (string.IsNullOrWhiteSpace(contentType))
+				throw new ArgumentNullException(nameof(contentType), "Content-Type이 null이거나 비어 있습니다.");
+		}
+
+		/// <summary>Body 유효성 검사</summary>
+		public static void ValidateBody(byte[] body)
+		{
+			if (body == null)
+				throw new ArgumentNullException(nameof(body), "요청 바디가 null입니다.");
+		}
+
+		/// <summary>Path 유효성 검사</summary>
+		public static void ValidatePath(string savePath)
+		{
+			if (string.IsNullOrWhiteSpace(savePath))
+				throw new ArgumentException("path url cannot be null or empty.", nameof(savePath));
+		}
+		#endregion
+
+		/// <summary>공통 예외 로깅 함수</summary>
+		public static async UniTask<T> ErrorLogging<T>(Func<UniTask<T>> taskFunc)
+		{
+			try
+			{
+				return await taskFunc();
+			}
+			catch (OperationCanceledException ex)
+			{
+				// 취소 예외를 로그 내용 포함한 새 예외로 상위에 전달
+				throw new OperationCanceledException($"[RestApiUtility] Operation canceled 발생\n{ex.Message}", ex);
+			}
+			catch (Exception ex)
+			{
+				// 일반 예외를 로그 내용 포함한 새 예외로 상위에 전달
+				throw new Exception($"[RestApiUtility] Exception 발생\n{ex.Message}", ex);
+			}
+		}
 	}
 }

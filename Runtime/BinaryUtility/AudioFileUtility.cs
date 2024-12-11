@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using static Suk.RestApi.TaskRestApiUtility;
+using static Suk.RestApi.RestApiUtility;
 
 namespace Suk.BinaryUtility
 {

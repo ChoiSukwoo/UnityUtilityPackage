@@ -19,7 +19,7 @@ namespace Suk.Json
 			}
 			catch (JsonException ex)
 			{
-				throw new JsonException($"[JsonParser] Serialize\nJSON 직렬화 실패: {ex.Message}", ex);
+				throw new JsonException($"[JsonParser] Serialize\nJSON 직렬화 실패\njsonRespone : {json}\nError : {ex.Message}", ex);
 			}
 		}
 
