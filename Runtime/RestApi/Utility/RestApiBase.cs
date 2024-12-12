@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
@@ -39,7 +40,8 @@ namespace Suk.RestApi
 				request.downloadHandler = CreateDownloadHandler(url, expectedType);
 
 				// 3. 전송 상태를 디버깅 로그에 출력
-				RestApiDebug.Request(request, headers);
+				Stopwatch stopwatch = Stopwatch.StartNew();
+				RestApiDebug.Request(request, headers, stopwatch);
 
 				// 4. 요청 시작 및 전송 상태 추적
 				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
@@ -51,12 +53,12 @@ namespace Suk.RestApi
 				// 5. 요청 후 Content-Type 확인
 				if (!ValidateContentType(request, ref expectedType))
 				{
-					RestApiDebug.Result(request, ContentTypeState.Unknown);
+					RestApiDebug.Result(request, ContentTypeState.Unknown, stopwatch);
 					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
 				// 6. 요청 결과를 디버깅 로그에 출력
-				RestApiDebug.Result(request, expectedType);
+				RestApiDebug.Result(request, expectedType, stopwatch);
 
 				// 7. 실패 처리
 				if (request.result != UnityWebRequest.Result.Success)
@@ -71,6 +73,7 @@ namespace Suk.RestApi
 
 		public static async UniTask<T> Post<T>(string url, byte[] bodyData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, ContentTypeState expectedType = ContentTypeState.Unknown, CancellationToken cancellationToken = default)
 		{
+
 			using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
 			{
 				// 1. 헤더 설정
@@ -83,7 +86,8 @@ namespace Suk.RestApi
 				request.downloadHandler = CreateDownloadHandler(url, expectedType);
 
 				// 4. 전송 상태를 사용자에게 알림
-				RestApiDebug.Request(request, headers);
+				Stopwatch stopwatch = Stopwatch.StartNew();
+				RestApiDebug.Request(request, headers, stopwatch);
 
 				// 5. 요청 시작 및 전송 상태 추적
 				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
@@ -94,12 +98,12 @@ namespace Suk.RestApi
 				// 5. 요청 후 Content-Type 확인
 				if (!ValidateContentType(request, ref expectedType))
 				{
-					RestApiDebug.Result(request, ContentTypeState.Unknown);
+					RestApiDebug.Result(request, ContentTypeState.Unknown, stopwatch);
 					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
 				// 7. 결과 출력
-				RestApiDebug.Result(request, expectedType);
+				RestApiDebug.Result(request, expectedType, stopwatch);
 
 				// 7. 실패 처리
 				if (request.result != UnityWebRequest.Result.Success)

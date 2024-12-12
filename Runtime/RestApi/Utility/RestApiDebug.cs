@@ -1,15 +1,14 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace Suk.RestApi
 {
 	internal static class RestApiDebug
 	{
-		public static void Request(UnityWebRequest request, Dictionary<string, string> headers)
+		public static void Request(UnityWebRequest request, Dictionary<string, string> headers, Stopwatch stopwatch)
 		{
-
 			//출력 거부
 			if (!RestApiState.enableDebugLog)
 				return;
@@ -19,6 +18,7 @@ namespace Suk.RestApi
 			reqInfo.AppendLine("[RestApiUtility] Sending Request:")
 				.AppendLine($"Method: {request.method}")
 				.AppendLine($"URL: {request.url}")
+				.AppendLine($"Start Time: {System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}")
 				.AppendLine("Headers:");
 
 			if (headers != null)
@@ -45,21 +45,26 @@ namespace Suk.RestApi
 				}
 			}
 
-			Debug.Log(reqInfo.ToString()); // 응답 정보 로그 한 번 출력
+			UnityEngine.Debug.Log(reqInfo.ToString()); // 응답 정보 로그 한 번 출력
 		}
 
-		public static void Result(UnityWebRequest request, ContentTypeState contentTypeState)
+		public static void Result(UnityWebRequest request, ContentTypeState contentTypeState, Stopwatch stopwatch)
 		{
-
 			//출력 거부
 			if (!RestApiState.enableDebugLog)
 				return;
 
+			stopwatch.Stop();
+			long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+			string endTime = System.DateTime.UtcNow.ToString("o");
 			var resInfo = new StringBuilder();
 			string contentType = request.GetResponseHeader("Content-Type");
 
 			resInfo.AppendLine("[RestApiUtility] Request Completed.")
 					.AppendLine($"Status: {(request.result == UnityWebRequest.Result.Success ? "Success" : "Failure")}")
+					.AppendLine($"End Time: {System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}")
+					.AppendLine($"Elapsed Time: {elapsedMilliseconds} ms")
 					.AppendLine($"Content-Type: {contentType}")
 					.AppendLine($"Status Code: {request.responseCode}")
 					.AppendLine($"Uploaded Bytes: {request.uploadedBytes}")
@@ -70,7 +75,7 @@ namespace Suk.RestApi
 			if (request.result != UnityWebRequest.Result.Success)
 			{
 				resInfo.AppendLine($"Status: Failure").AppendLine($"Error: {request.error}");
-				Debug.Log(resInfo.ToString());
+				UnityEngine.Debug.Log(resInfo.ToString());
 				return; // 실패 시 추가 디버깅 중단
 			}
 
@@ -92,7 +97,7 @@ namespace Suk.RestApi
 				}
 			}
 
-			Debug.Log(resInfo.ToString()); // 응답 정보 로그 한 번 출력
+			UnityEngine.Debug.Log(resInfo.ToString()); // 응답 정보 로그 한 번 출력
 		}
 	}
 }

@@ -380,7 +380,7 @@ namespace Suk.RestApi
 		/// <summary> N회 재시도 가능한 고차 함수 </summary>
 		public static async UniTask<T> RetryAsync<T>(Func<UniTask<T>> taskFactory, int retryCount = -1, float retryDelay = 1.0f)
 		{
-			int currentRetry = 0;
+			int currentRetry = 1;
 			retryCount = retryCount == -1 ? RestApiState.retryCount : retryCount;
 
 			while (true)
