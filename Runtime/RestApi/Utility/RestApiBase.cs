@@ -60,7 +60,7 @@ namespace Suk.RestApi
 
 				// 7. 실패 처리
 				if (request.result != UnityWebRequest.Result.Success)
-					throw new Exception($"Request failed: {request.error}");
+					throw new Exception($"Api Request failed: {request.error}");
 
 				// 8. 응답 처리 및 반환
 				T result = await ParseResponse<T>(request, expectedType, contentType);
@@ -94,7 +94,8 @@ namespace Suk.RestApi
 				// 5. 요청 후 Content-Type 확인
 				if (!ValidateContentType(request, ref expectedType))
 				{
-					throw new Exception($"[RestApiBase] Unrecognized or missing Content-Type: {contentType}");
+					RestApiDebug.Result(request, ContentTypeState.Unknown);
+					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
 				// 7. 결과 출력
@@ -102,7 +103,7 @@ namespace Suk.RestApi
 
 				// 7. 실패 처리
 				if (request.result != UnityWebRequest.Result.Success)
-					throw new Exception($"[RestApiBase] Request failed: {request.error}");
+					throw new Exception($"Api Request failed: {request.error}");
 
 				// 8. 응답 처리 및 반환
 				return await ParseResponse<T>(request, expectedType, contentType);

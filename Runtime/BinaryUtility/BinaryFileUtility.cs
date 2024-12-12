@@ -21,13 +21,13 @@ namespace Suk.BinaryUtility
 
 				cancellationToken.ThrowIfCancellationRequested(); // 마지막으로 취소 요청 확인
 			}
-			catch (OperationCanceledException)
+			catch (OperationCanceledException ex)
 			{
-				throw new OperationCanceledException($"[BinaryUtility] SaveToFileAsync\n작업이 취소되었습니다.");
+				throw new OperationCanceledException($"[BinaryUtility] Operation canceled 발생 [SaveBytesToFileAsync] 작업이 취소 되었습니다.\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
-				throw new IOException($"[BinaryUtility] SaveToFileAsync\n파일 저장 중 오류 발생: {ex.Message}", ex);
+				throw new IOException($"[BinaryUtility] 파일 저장 중 오류 발생: {ex.Message}", ex);
 			}
 		}
 
@@ -57,9 +57,9 @@ namespace Suk.BinaryUtility
 					return memoryStream.ToArray();
 				}
 			}
-			catch (OperationCanceledException)
+			catch (OperationCanceledException ex)
 			{
-				throw new OperationCanceledException($"[BinaryUtility] LoadFromFileAsync\n작업이 취소되었습니다.");
+				throw new OperationCanceledException($"[BinaryUtility] Operation canceled 발생 [LoadFromFileAsync] 작업이 취소 되었습니다.\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
@@ -70,23 +70,11 @@ namespace Suk.BinaryUtility
 		/// <summary> byte[] 데이터를 임시 파일로 저장하고 경로를 반환합니다 </summary>
 		public static async UniTask<string> SaveBytesToTempFileAsync(byte[] data, CancellationToken cancellationToken = default)
 		{
-			try
-			{
-				string uniqueFileName = $"temp_audio_{Guid.NewGuid()}.tmp";
-				string tempPath = Path.Combine(Application.temporaryCachePath, uniqueFileName);
-				await BinaryFileUtility.SaveBytesToFileAsync(data, tempPath, cancellationToken);
-				return tempPath;
-			}
-			catch (OperationCanceledException ex)
-			{
-				throw new OperationCanceledException($"[AudioFileUtility] SaveBytesToTempFileAsync\n작업이 취소되었습니다: {ex.Message}", ex);
-			}
-			catch (Exception ex)
-			{
-				throw new IOException($"[AudioFileUtility] SaveBytesToTempFileAsync\n파일 저장 중 오류 발생: {ex.Message}", ex);
-			}
+			string uniqueFileName = $"temp_audio_{Guid.NewGuid()}.tmp";
+			string tempPath = Path.Combine(Application.temporaryCachePath, uniqueFileName);
+			await SaveBytesToFileAsync(data, tempPath, cancellationToken);
+			return tempPath;
 		}
-
 	}
 }
 

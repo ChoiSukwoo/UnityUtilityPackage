@@ -1,7 +1,7 @@
 namespace Suk.RestApi
 {
 
-	//응답용 컨텐츠 타입
+	/// <summary> 자체 Content Type </summary>
 	internal enum ContentTypeState
 	{
 		Unknown = -1,    // 알 수 없는 데이터
@@ -13,7 +13,7 @@ namespace Suk.RestApi
 		Asset = 6       // 에셋 번들
 	}
 
-
+	/// <summary> 자체 Audio Type </summary>
 	public enum AudioContentType
 	{
 		Unknown = -1, //알수 없음
@@ -22,6 +22,7 @@ namespace Suk.RestApi
 		Ogg = 3         // audio/ogg
 	}
 
+	/// <summary> 자체 Video Type </summary>
 	public enum VideoContentType
 	{
 		Unknown = -1,
@@ -29,6 +30,7 @@ namespace Suk.RestApi
 		Webm = 2    // video/webm
 	}
 
+	/// <summary> 자체 Image Type </summary>
 	public enum ImageContentType
 	{
 		Unknown = -1,

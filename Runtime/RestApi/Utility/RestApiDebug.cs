@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
-using static Suk.RestApi.RestApiState;
-
-
 
 namespace Suk.RestApi
 {
@@ -14,7 +11,7 @@ namespace Suk.RestApi
 		{
 
 			//출력 거부
-			if (!enableDebugLog)
+			if (!RestApiState.enableDebugLog)
 				return;
 
 			var reqInfo = new StringBuilder();
@@ -55,7 +52,7 @@ namespace Suk.RestApi
 		{
 
 			//출력 거부
-			if (!enableDebugLog)
+			if (!RestApiState.enableDebugLog)
 				return;
 
 			var resInfo = new StringBuilder();

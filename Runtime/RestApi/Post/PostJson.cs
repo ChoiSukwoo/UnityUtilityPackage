@@ -47,7 +47,7 @@ namespace Suk
 			return await ErrorLogging(async () =>
 			{
 				byte[] videoData = await PostJsonAsync<Req, byte[]>(url, body, ContentTypeState.Video, onProgress, headers, cancelToken);
-				return await HandleVideoResponse(videoData, savePath, cancelToken); // 비디오 저장 핸들러
+				return await HandleVideoResponse(videoData, savePath, cancelToken);
 			});
 		}
 

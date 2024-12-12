@@ -45,7 +45,7 @@ namespace Suk
 			return await ErrorLogging(async () =>
 			{
 				byte[] videoData = await PostAudioAsync<byte[]>(url, body, ContentTypeState.Video, audioType, onProgress, headers, cancellationToken);
-				return await HandleVideoResponse(videoData, savePath, cancellationToken); // 비디오 저장 핸들링
+				return await HandleVideoResponse(videoData, savePath, cancellationToken);
 			});
 		}
 
@@ -60,13 +60,10 @@ namespace Suk
 		{
 			//url 검증
 			ValidateUrl(url);
-
 			//bodyData 검증
 			ValidateBody(body);
-
 			// 헤더 설정
 			headers = SetContentHeader(headers, GetContentTypeFromAudioContentType(audioType));
-
 			// 요청 전송 및 응답 반환
 			return await Post<T>(url, body, onProgress, headers, expectContentType, cancellationToken);
 		}

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -9,7 +8,6 @@ using Suk.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using static Suk.RestApi.RestApiState;
 
 namespace Suk.RestApi
 {
@@ -105,44 +103,38 @@ namespace Suk.RestApi
 			if (request == null)
 				throw new ArgumentNullException(nameof(request), "UnityWebRequest cannot be null.");
 
-			try
+			switch (expectedType)
 			{
-				switch (expectedType)
-				{
-					case ContentTypeState.Image:
-						if (typeof(T) != typeof(Texture2D))
-							throw new InvalidCastException("Image 유형에 대해 Texture2D로 캐스팅이 필요합니다.");
-						return (T)(object)DownloadHandlerTexture.GetContent(request);
-					case ContentTypeState.Audio:
-						if (typeof(T) != typeof(AudioClip))
-							throw new InvalidCastException("Audio 유형에 대해 AudioClip으로 캐스팅이 필요합니다.");
-						byte[] audioData = request.downloadHandler.data;
-						AudioType unityAudioType = GetAudioTypeFromContentType(contentType);
-						return (T)(object)await AudioFileUtility.CreateAudioClipAsync(audioData, unityAudioType);
-					case ContentTypeState.Asset:
-						if (typeof(T) != typeof(AssetBundle))
-							throw new InvalidCastException("Asset 유형에 대해 AssetBundle로 캐스팅이 필요합니다.");
-						return (T)(object)DownloadHandlerAssetBundle.GetContent(request);
-					case ContentTypeState.Text:
-						if (typeof(T) != typeof(string))
-							throw new InvalidCastException("Text 유형에 대해 string으로 캐스팅이 필요합니다.");
-						return (T)(object)request.downloadHandler.text;
-					case ContentTypeState.Binary:
-					case ContentTypeState.Video:
-						if (typeof(T) != typeof(byte[]))
-							throw new InvalidCastException("Binary 또는 Video 유형에 대해 byte[]로 캐스팅이 필요합니다.");
-						return (T)(object)request.downloadHandler.data;
-					default:
-						throw new Exception($"지원되지 않는 ContentTypeState: {expectedType}");
-				}
-			}
-			catch (InvalidCastException ex)
-			{
-				throw new InvalidCastException($"ParseResponse\n{ex.Message}", ex);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception($"ParseResponse\n알 수 없는 에러 발생: {ex.Message}", ex);
+				case ContentTypeState.Image:
+					if (typeof(T) != typeof(Texture2D))
+						throw new InvalidCastException($"ContentTypeState.Image는 Texture2D로 예상되지만, {typeof(T).Name}로 파싱을 시도하였습니다.");
+					return (T)(object)DownloadHandlerTexture.GetContent(request);
+
+				case ContentTypeState.Audio:
+					if (typeof(T) != typeof(AudioClip))
+						throw new InvalidCastException($"ContentTypeState.Audio는 AudioClip으로 예상되지만, {typeof(T).Name}로 파싱을 시도하였습니다.");
+					byte[] audioData = request.downloadHandler.data;
+					AudioType unityAudioType = GetAudioTypeFromContentType(contentType);
+					return (T)(object)await AudioFileUtility.CreateAudioClipAsync(audioData, unityAudioType);
+
+				case ContentTypeState.Asset:
+					if (typeof(T) != typeof(AssetBundle))
+						throw new InvalidCastException($"ContentTypeState.Asset는 AssetBundle로 예상되지만, {typeof(T).Name}로 파싱을 시도하였습니다.");
+					return (T)(object)DownloadHandlerAssetBundle.GetContent(request);
+
+				case ContentTypeState.Text:
+					if (typeof(T) != typeof(string))
+						throw new InvalidCastException($"ContentTypeState.Text는 string으로 예상되지만, {typeof(T).Name}로 파싱을 시도하였습니다.");
+					return (T)(object)request.downloadHandler.text;
+
+				case ContentTypeState.Binary:
+				case ContentTypeState.Video:
+					if (typeof(T) != typeof(byte[]))
+						throw new InvalidCastException($"ContentTypeState.Binary 또는 ContentTypeState.Video는 byte[]로 예상되지만, {typeof(T).Name}로 파싱을 시도하였습니다.");
+					return (T)(object)request.downloadHandler.data;
+
+				default:
+					throw new Exception($"지원되지 않는 ContentTypeState: {expectedType}");
 			}
 		}
 
@@ -156,7 +148,7 @@ namespace Suk.RestApi
 			{
 				while (!asyncOperation.isDone)
 				{
-					if (Time.time >= lastProgressUpdate + minUpdateInterval || Mathf.Abs(asyncOperation.progress - lastProgress) >= minProgressChange)
+					if (Time.time >= lastProgressUpdate + RestApiState.minUpdateInterval || Mathf.Abs(asyncOperation.progress - lastProgress) >= RestApiState.minProgressChange)
 					{
 						progress?.Invoke(asyncOperation.progress); // 진행률 업데이트
 						lastProgress = asyncOperation.progress;
@@ -167,18 +159,17 @@ namespace Suk.RestApi
 					await UniTask.Yield(PlayerLoopTiming.Update, token);
 				}
 			}
-			catch (OperationCanceledException)
+			catch (OperationCanceledException ex)
 			{
-				throw new OperationCanceledException("UpdateProgress Error : API를 통한 데이터 다운로드 작업이 취소되었습니다.", token);
+				throw new OperationCanceledException($"Operation canceled 발생 [UpdateProgress] 작업이 취소 되었습니다.\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"UpdateProgress Error : API를 통한 데이터 다운로드 작업 중 오류 발생\n {ex.Message}", ex);
+				throw new Exception($"API를 통한 데이터 다운로드 작업 중 오류 발생\n {ex.Message}", ex);
 			}
 
 			progress?.Invoke(1f);
 		}
-
 
 		#region DataConvert
 		public static byte[] ConvertTextToBytes(string text)
@@ -194,10 +185,10 @@ namespace Suk.RestApi
 
 			// Key-Value 쌍을 인코딩하여 List<string>에 저장
 			List<string> encodedDataParts = new List<string>();
-			foreach (KeyValuePair<string, string> kvp in body)
+			foreach (var (key, value) in body)
 			{
-				string encodedKey = Uri.EscapeDataString(Convert.ToString(kvp.Key ?? string.Empty));
-				string encodedValue = Uri.EscapeDataString(Convert.ToString(kvp.Value ?? string.Empty));
+				string encodedKey = Uri.EscapeDataString(key);
+				string encodedValue = Uri.EscapeDataString(value);
 				encodedDataParts.Add($"{encodedKey}={encodedValue}");
 			}
 
@@ -213,15 +204,8 @@ namespace Suk.RestApi
 		/// <summary> JSON 응답 데이터를 지정된 제네릭 타입으로 파싱합니다. </summary>
 		public static T HandleJsonResponse<T>(string jsonResponse)
 		{
-			try
-			{
-				var parsedData = JsonParser.Parse<T>(jsonResponse);
-				return parsedData;
-			}
-			catch (Exception ex)
-			{
-				throw new Exception($"HandleJsonResponse\n {ex.Message}", ex);
-			}
+			var parsedData = JsonParser.Parse<T>(jsonResponse);
+			return parsedData;
 		}
 
 		/// <summary> 비디오 데이터를 파일로 저장합니다. </summary>
@@ -232,29 +216,18 @@ namespace Suk.RestApi
 
 			ValidatePath(savePath);
 
-			try
-			{
-				// BinaryUtility를 사용해 비동기로 파일 저장
-				await BinaryFileUtility.SaveBytesToFileAsync(videoData, savePath, cancellationToken);
-
+			// BinaryUtility를 사용해 비동기로 파일 저장
+			await BinaryFileUtility.SaveBytesToFileAsync(videoData, savePath, cancellationToken);
+			if (RestApiState.enableDebugLog)
 				Debug.Log($"[RestApiUtility] HandleVideoResponse\nVideo saved successfully at: {savePath}");
-				return savePath;
-			}
-			catch (OperationCanceledException ex)
-			{
-				throw new OperationCanceledException($"[RestApiUtility] HandleVideoResponse\nVideo save operation was canceled.", ex);
-			}
-			catch (Exception ex)
-			{
-				throw new IOException($"[RestApiUtility] HandleVideoResponse\nFailed to save video: {ex.Message}", ex);
-			}
+			return savePath;
 		}
 
 		/// <summary> JSON를 바이트 배열로 변환하여 반환합니다. </summary>
 		public static byte[] HandleJsonBody<T>(T body)
 		{
 			if (body == null)
-				throw new ArgumentNullException(nameof(body), "[RestApiUtility] HandleJsonBody\nBody 객체가 null입니다.");
+				throw new ArgumentNullException(nameof(body), "Body 객체가 null입니다.");
 
 			byte[] bodyData = JsonParser.ToByteArray(body);
 			return bodyData;
@@ -268,7 +241,7 @@ namespace Suk.RestApi
 			if (RestApiModel.AudioContentTypeToContentType.TryGetByKey(contentType, out string type))
 				return type;
 
-			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromAudioContentType\nUnsupported AudioContentType: {contentType}");
+			throw new NotSupportedException($"[RestApiUtility] 에서는 AudioContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> Content-Type에서 AudioContentType을 추출합니다. </summary>
@@ -277,7 +250,7 @@ namespace Suk.RestApi
 			if (RestApiModel.AudioContentTypeToContentType.TryGetByValue(contentType, out AudioContentType audioContentType))
 				return audioContentType;
 
-			return AudioContentType.Unknown;
+			throw new NotSupportedException($"[RestApiUtility] 에서는 오디오 string ContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> AudioContentType에서 Unity AudioType을 추출합니다. </summary>
@@ -286,7 +259,7 @@ namespace Suk.RestApi
 			if (RestApiModel.AudioContentTypeToAudioType.TryGetByKey(contentType, out AudioType audioType))
 				return audioType;
 
-			return AudioType.UNKNOWN;
+			throw new NotSupportedException($"[RestApiUtility] 에서는 AudioContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> Unity AudioType에서 AudioContentType을 추출합니다. </summary>
@@ -295,7 +268,7 @@ namespace Suk.RestApi
 			if (RestApiModel.AudioContentTypeToAudioType.TryGetByValue(audioType, out AudioContentType contentType))
 				return contentType;
 
-			return AudioContentType.Unknown;
+			throw new NotSupportedException($"[RestApiUtility] 에서는 AudioType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> Content-Type에서 Unity AudioType을 추출합니다. </summary>
@@ -304,7 +277,7 @@ namespace Suk.RestApi
 			if (RestApiModel.ContentTypeToAudioType.TryGetByKey(contentType, out AudioType audioType))
 				return audioType;
 
-			return AudioType.UNKNOWN;
+			throw new NotSupportedException($"[RestApiUtility] 에서는 오디오 string ContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> Unity AudioType에서 Content-Type을 추출합니다. </summary>
@@ -313,7 +286,7 @@ namespace Suk.RestApi
 			if (RestApiModel.ContentTypeToAudioType.TryGetByValue(audioType, out string contentType))
 				return contentType;
 
-			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromAudioType\nUnsupported Unity AudioType: {audioType}");
+			throw new NotSupportedException($"[RestApiUtility] 에서는 AudioType : {audioType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> VideoContentType에서 Content-Type(MIME Type)을 추출합니다. </summary>
@@ -322,7 +295,7 @@ namespace Suk.RestApi
 			if (RestApiModel.VideoContentTypeToContentType.TryGetByKey(contentType, out string type))
 				return type;
 
-			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromVideoContentType\nUnsupported VideoContentType: {contentType}");
+			throw new NotSupportedException($"[RestApiUtility] 에서는 VideoContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> Content-Type(MIME Type)에서 VideoContentType을 추출합니다. </summary>
@@ -331,7 +304,7 @@ namespace Suk.RestApi
 			if (RestApiModel.VideoContentTypeToContentType.TryGetByValue(contentType, out VideoContentType videoContentType))
 				return videoContentType;
 
-			return VideoContentType.Unknown;
+			throw new NotSupportedException($"[RestApiUtility] 에서는 비디오 string ContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> ImageContentType에서 Content-Type(MIME Type)을 추출합니다. </summary>
@@ -340,7 +313,7 @@ namespace Suk.RestApi
 			if (RestApiModel.ImageContentTypeToContentType.TryGetByKey(contentType, out string type))
 				return type;
 
-			throw new NotSupportedException($"[RestApiUtility] GetContentTypeFromImageContentType\nUnsupported ImageContentType: {contentType}");
+			throw new NotSupportedException($"[RestApiUtility] 에서는 ImageContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 
 		/// <summary> Content-Type(MIME Type)에서 ImageContentType을 추출합니다. </summary>
@@ -349,12 +322,11 @@ namespace Suk.RestApi
 			if (RestApiModel.ImageContentTypeToContentType.TryGetByValue(contentType, out ImageContentType imageContentType))
 				return imageContentType;
 
-			return ImageContentType.Unknown;
+			throw new NotSupportedException($"[RestApiUtility] 에서는 이미지 string ContentType : {contentType} 타입을 지원하지 않습니다.");
 		}
 		#endregion
 
 		#region Validate
-
 		/// <summary>URL 유효성 검사</summary>
 		public static void ValidateUrl(string url)
 		{
@@ -382,7 +354,7 @@ namespace Suk.RestApi
 		public static void ValidatePath(string savePath)
 		{
 			if (string.IsNullOrWhiteSpace(savePath))
-				throw new ArgumentException("path url cannot be null or empty.", nameof(savePath));
+				throw new ArgumentException(nameof(savePath), $"path url cannot be null or empty. : {savePath}");
 		}
 		#endregion
 
@@ -396,12 +368,41 @@ namespace Suk.RestApi
 			catch (OperationCanceledException ex)
 			{
 				// 취소 예외를 로그 내용 포함한 새 예외로 상위에 전달
-				throw new OperationCanceledException($"[RestApiUtility] Operation canceled 발생\n{ex.Message}", ex);
+				throw new OperationCanceledException($"[RestApi] Operation canceled 발생 작업이 취소 되었습니다.\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
 				// 일반 예외를 로그 내용 포함한 새 예외로 상위에 전달
-				throw new Exception($"[RestApiUtility] Exception 발생\n{ex.Message}", ex);
+				throw new Exception($"[RestApi] Exception 발생\n{ex.Message}", ex);
+			}
+		}
+
+		/// <summary> N회 재시도 가능한 고차 함수 </summary>
+		public static async UniTask<T> RetryAsync<T>(Func<UniTask<T>> taskFactory, int retryCount = -1, float retryDelay = 1.0f)
+		{
+			int currentRetry = 0;
+			retryCount = retryCount == -1 ? RestApiState.retryCount : retryCount;
+
+			while (true)
+			{
+				try
+				{
+					return await taskFactory();
+				}
+				catch (OperationCanceledException ex)
+				{
+					throw ex;
+				}
+				catch (Exception ex)
+				{
+					currentRetry++;
+
+					if (retryCount >= 0 && currentRetry > retryCount)
+						throw new Exception($"RetryAsync failed after {retryCount} attempts.\n{ex.Message}", ex);
+
+					Debug.LogWarning($"Retry {currentRetry}/{retryCount} - Waiting {retryDelay} seconds...");
+					await UniTask.Delay(TimeSpan.FromSeconds(retryDelay));
+				}
 			}
 		}
 	}

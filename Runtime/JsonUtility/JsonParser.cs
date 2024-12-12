@@ -11,7 +11,7 @@ namespace Suk.Json
 		public static T Parse<T>(string json)
 		{
 			if (string.IsNullOrWhiteSpace(json))
-				throw new ArgumentNullException(nameof(json), "[JsonParser] Parse\nJSON 문자열이 null이거나 공백입니다.");
+				throw new ArgumentNullException(nameof(json), "[JsonParser]\nJSON 문자열이 null이거나 공백입니다.");
 
 			try
 			{
@@ -19,7 +19,7 @@ namespace Suk.Json
 			}
 			catch (JsonException ex)
 			{
-				throw new JsonException($"[JsonParser] Serialize\nJSON 직렬화 실패\njsonRespone : {json}\nError : {ex.Message}", ex);
+				throw new JsonException($"[JsonParser]\nJSON 직렬화 실패 \n======JSON======\n {json} \n======Error======: {ex.Message}", ex);
 			}
 		}
 

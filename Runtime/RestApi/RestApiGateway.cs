@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -411,6 +412,12 @@ namespace Suk.RestApi
 		public static async UniTask<Texture2D> PostImageForImage(string url, byte[] body, ImageContentType imageType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 			=> await PostImage.PostImageForImage(url, body, imageType, onProgress, headers, cancellationToken);
 
+		#endregion
+
+		#region Utility
+		/// <summary> N회 재시도 가능한 고차 함수 (외부 접근용) </summary>
+		public static async UniTask<T> RetryAsync<T>(Func<UniTask<T>> taskFactory, int retryCount = -1, float retryDelay = 1.0f)
+			=> await RestApiUtility.RetryAsync(taskFactory, retryCount, retryDelay);
 		#endregion
 	}
 }
