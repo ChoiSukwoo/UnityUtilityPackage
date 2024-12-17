@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -37,7 +38,9 @@ namespace Suk.RestApi
 				return;
 			//헤더값을 request에 등록
 			foreach ((string key, string value) in headers)
+			{
 				request.SetRequestHeader(key, value);
+			}
 		}
 
 		/// <summary> URL 및 컨텐츠 유형에 따라 적합한 DownloadHandler를 생성합니다. </summary>
@@ -355,6 +358,15 @@ namespace Suk.RestApi
 		{
 			if (string.IsNullOrWhiteSpace(savePath))
 				throw new ArgumentException(nameof(savePath), $"path url cannot be null or empty. : {savePath}");
+
+			// 'file://' URL 처리
+			if (Uri.TryCreate(savePath, UriKind.Absolute, out Uri uri) && uri.IsFile)
+				savePath = uri.LocalPath; // 'file:///' URL을 로컬 파일 경로로 변환
+
+			// 경로가 절대 경로인지 확인
+			if (!Path.IsPathRooted(savePath))
+				throw new ArgumentException($"The path is not a valid absolute path. Given path: {savePath}");
+
 		}
 		#endregion
 
@@ -404,6 +416,53 @@ namespace Suk.RestApi
 					await UniTask.Delay(TimeSpan.FromSeconds(retryDelay));
 				}
 			}
+		}
+
+		/// <summary> 파일 경로에서 이미지 타입을 반환합니다. </summary>
+		public static ImageContentType GetImageContentType(string filePath)
+		{
+			if (string.IsNullOrEmpty(filePath))
+				return ImageContentType.Unknown;
+
+			string extension = Path.GetExtension(filePath)?.ToLowerInvariant();
+			return extension switch
+			{
+				".png" => ImageContentType.Png,
+				".jpg" => ImageContentType.Jpeg,
+				".jpeg" => ImageContentType.Jpeg,
+				_ => ImageContentType.Unknown
+			};
+		}
+
+		/// <summary> 파일 경로에서 오디오 타입을 반환합니다. </summary>
+		public static AudioContentType GetAudioContentType(string filePath)
+		{
+			if (string.IsNullOrEmpty(filePath))
+				return AudioContentType.Unknown;
+
+			string extension = Path.GetExtension(filePath)?.ToLowerInvariant();
+			return extension switch
+			{
+				".mp3" => AudioContentType.MP3,
+				".wav" => AudioContentType.Wav,
+				".ogg" => AudioContentType.Ogg,
+				_ => AudioContentType.Unknown
+			};
+		}
+
+		/// <summary> 파일 경로에서 비디오 타입을 반환합니다. </summary>
+		public static VideoContentType GetVideoContentType(string filePath)
+		{
+			if (string.IsNullOrEmpty(filePath))
+				return VideoContentType.Unknown;
+
+			string extension = Path.GetExtension(filePath)?.ToLowerInvariant();
+			return extension switch
+			{
+				".mp4" => VideoContentType.Mp4,
+				".webm" => VideoContentType.Webm,
+				_ => VideoContentType.Unknown
+			};
 		}
 	}
 }

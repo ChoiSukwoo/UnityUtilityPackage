@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -13,7 +14,22 @@ namespace Suk.BinaryUtility
 		{
 			try
 			{
-				using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
+				string directory = Path.GetDirectoryName(filePath);
+
+				//경로 없을시 생성
+				if (!Directory.Exists(directory))
+					Directory.CreateDirectory(directory);
+
+				//파일 존재시 삭제
+				if (File.Exists(filePath))
+				{
+					File.Delete(filePath);
+					Debug.Log($"Existing file deleted: {filePath}");
+				}
+
+				int bufferSize = GetOptimalBufferSize(data.Length);
+
+				using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, useAsync: true))
 				{
 					cancellationToken.ThrowIfCancellationRequested(); // 취소 요청 확인
 					await fileStream.WriteAsync(data, 0, data.Length, cancellationToken);
@@ -34,27 +50,35 @@ namespace Suk.BinaryUtility
 		/// <summary> 지정된 경로에서 byte[] 데이터를 비동기로 읽어옵니다 </summary>
 		public static async UniTask<byte[]> LoadFromFileAsync(string filePath, CancellationToken cancellationToken = default)
 		{
-			const int bufferSize = 4096; // 4KB 버퍼 크기
+			int bufferSize = GetOptimalBufferSize(filePath); // 버퍼 크기 결정
 
 			try
 			{
-				using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize, useAsync: true))
-				using (var memoryStream = new MemoryStream())
+				using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize, useAsync: true))
+				using (MemoryStream memoryStream = new MemoryStream())
 				{
-					byte[] buffer = new byte[bufferSize];
+					byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 					int bytesRead;
 
-					// 버퍼 단위로 읽어서 메모리 스트림에 기록
-					while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+					try
 					{
-						cancellationToken.ThrowIfCancellationRequested(); // 취소 요청 확인
-						await memoryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+						// 버퍼 단위로 읽어서 메모리 스트림에 기록
+						while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+						{
+							cancellationToken.ThrowIfCancellationRequested(); // 취소 요청 확인
+							await memoryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+						}
+
+						cancellationToken.ThrowIfCancellationRequested(); // 마지막으로 취소 요청 확인
+
+						// 메모리 스트림에서 byte[]로 변환
+						return memoryStream.ToArray();
 					}
-
-					cancellationToken.ThrowIfCancellationRequested(); // 마지막으로 취소 요청 확인
-
-					// 메모리 스트림에서 byte[]로 변환
-					return memoryStream.ToArray();
+					finally
+					{
+						// 버퍼 반환
+						ArrayPool<byte>.Shared.Return(buffer);
+					}
 				}
 			}
 			catch (OperationCanceledException ex)
@@ -74,6 +98,28 @@ namespace Suk.BinaryUtility
 			string tempPath = Path.Combine(Application.temporaryCachePath, uniqueFileName);
 			await SaveBytesToFileAsync(data, tempPath, cancellationToken);
 			return tempPath;
+		}
+
+
+		//파일 크기에 따라 버퍼 크기 변경
+		public static int GetOptimalBufferSize(string filePath)
+		{
+			// 경로 없을시 기본 버퍼 크기 512KB
+			if (!File.Exists(filePath))
+				return 524288;
+
+			FileInfo fileInfo = new FileInfo(filePath);
+			return GetOptimalBufferSize(fileInfo.Length);
+		}
+
+
+		public static int GetOptimalBufferSize(long dataSize)
+		{
+			const int smallFileBuffer = 524288; // 512KB
+			const int largeFileBuffer = 2097152; // 2MB
+			const long fileSizeThreshold = 500 * 1024 * 1024; // 500MB
+
+			return dataSize > fileSizeThreshold ? largeFileBuffer : smallFileBuffer;
 		}
 	}
 }
