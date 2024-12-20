@@ -51,7 +51,7 @@ namespace Suk
 		}
 
 		/// <summary>빈 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostNoneForImage(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		public static async UniTask<Texture2D> PostNoneForTexture(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(() => PostNoneAsync<Texture2D>(url, ContentTypeState.Image, onProgress, headers, cancelToken));
 		}

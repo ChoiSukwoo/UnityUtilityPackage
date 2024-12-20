@@ -50,7 +50,7 @@ namespace Suk
 		}
 
 		/// <summary>바이너리 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostBinaryForImage(string url, byte[] body, string contentType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<Texture2D> PostBinaryForTexture(string url, byte[] body, string contentType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 		{
 			return await ErrorLogging(() => PostBinaryAsync<Texture2D>(url, body, contentType, onProgress, headers, cancellationToken));
 		}

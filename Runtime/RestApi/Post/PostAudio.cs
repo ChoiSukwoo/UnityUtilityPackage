@@ -50,7 +50,7 @@ namespace Suk
 		}
 
 		/// <summary>Audio 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostAudioForImage(string url, byte[] body, AudioContentType audioType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<Texture2D> PostAudioForTexture(string url, byte[] body, AudioContentType audioType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 		{
 			return await ErrorLogging(() => PostAudioAsync<Texture2D>(url, body, ContentTypeState.Image, audioType, onProgress, headers, cancellationToken));
 		}

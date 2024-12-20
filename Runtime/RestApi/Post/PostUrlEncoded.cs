@@ -50,7 +50,7 @@ namespace Suk
 		}
 
 		/// <summary>x-www-form-urlencoded 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostUrlEncodedForImage(string url, Dictionary<string, string> body, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
+		public static async UniTask<Texture2D> PostUrlEncodedForTexture(string url, Dictionary<string, string> body, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancellationToken = default)
 		{
 			return await ErrorLogging(() => PostUrlEncodedAsync<Texture2D>(url, body, ContentTypeState.Image, onProgress, headers, cancellationToken));
 		}

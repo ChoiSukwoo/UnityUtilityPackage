@@ -96,12 +96,12 @@ namespace Suk.RestApi
 			=> await PostNone.PostNoneForVideo(url, savePath, onProgress, headers, cancelToken);
 
 		/// <summary>로그인 토큰과 함께 빈 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostNoneForImageWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostNone.PostNoneForImage(url, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostNoneForTextureWithAuth(string url, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostNone.PostNoneForTexture(url, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>빈 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostNoneForImage(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostNone.PostNoneForImage(url, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostNoneForTexture(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostNone.PostNoneForTexture(url, onProgress, headers, cancelToken);
 		#endregion
 
 		#region PostText
@@ -146,12 +146,12 @@ namespace Suk.RestApi
 			=> await PostText.PostTextForVideo(url, body, savePath, contentType, onProgress, headers, cancelToken);
 
 		/// <summary>로그인 토큰과 함께 텍스트 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostTextForImageWithAuth(string url, string body, string authToken, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostText.PostTextForImage(url, body, contentType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostTextForTextureWithAuth(string url, string body, string authToken, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostText.PostTextForTexture(url, body, contentType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>텍스트 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostTextForImage(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostText.PostTextForImage(url, body, contentType, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostTextForTexture(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostText.PostTextForTexture(url, body, contentType, onProgress, headers, cancelToken);
 		#endregion
 
 		#region PostJson
@@ -197,12 +197,12 @@ namespace Suk.RestApi
 			=> await PostJson.PostJsonForVideo(url, body, savePath, onProgress, headers, cancelToken);
 
 		/// <summary>JSON 데이터를 POST 요청으로 전송하며, 인증 헤더를 추가합니다.</summary>
-		public static async UniTask<Texture2D> PostJsonForImageWithAuth<Req>(string url, Req body, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostJson.PostJsonForImage(url, body, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostJsonForTextureWithAuth<Req>(string url, Req body, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostJson.PostJsonForTexture(url, body, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>JSON 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostJsonForImage<Req>(string url, Req body, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostJson.PostJsonForImage(url, body, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostJsonForTexture<Req>(string url, Req body, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostJson.PostJsonForTexture(url, body, onProgress, headers, cancelToken);
 		#endregion
 
 		#region PostBinary
@@ -247,12 +247,12 @@ namespace Suk.RestApi
 			=> await PostBinary.PostBinaryForVideo(url, body, contentType, savePath, onProgress, headers, cancelToken);
 
 		/// <summary>바이너리 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostBinaryForImageWithAuth(string url, byte[] body, string contentType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostBinary.PostBinaryForImage(url, body, contentType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostBinaryForTextureWithAuth(string url, byte[] body, string contentType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostBinary.PostBinaryForTexture(url, body, contentType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>바이너리 데이터를 POST 요청으로 전송하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostBinaryForImage(string url, byte[] body, string contentType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostBinary.PostBinaryForImage(url, body, contentType, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostBinaryForTexture(string url, byte[] body, string contentType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostBinary.PostBinaryForTexture(url, body, contentType, onProgress, headers, cancelToken);
 
 		#endregion
 
@@ -298,12 +298,12 @@ namespace Suk.RestApi
 			=> await PostAudio.PostAudioForVideo(url, body, audioType, savePath, onProgress, headers, cancelToken);
 
 		/// <summary>Audio 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostAudioForImageWithAuth(string url, byte[] body, AudioContentType audioType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostAudio.PostAudioForImage(url, body, audioType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostAudioForTextureWithAuth(string url, byte[] body, AudioContentType audioType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostAudio.PostAudioForTexture(url, body, audioType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>Audio 데이터를 POST 요청으로 전송하며 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostAudioForImage(string url, byte[] body, AudioContentType audioType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostAudio.PostAudioForImage(url, body, audioType, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostAudioForTexture(string url, byte[] body, AudioContentType audioType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostAudio.PostAudioForTexture(url, body, audioType, onProgress, headers, cancelToken);
 
 		#endregion
 
@@ -349,12 +349,12 @@ namespace Suk.RestApi
 			=> await PostVideo.PostVideoForVideo(url, body, videoType, savePath, onProgress, headers, cancelToken);
 
 		/// <summary>Video 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostVideoForImageWithAuth(string url, byte[] body, VideoContentType videoType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostVideo.PostVideoForImage(url, body, videoType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostVideoForTextureWithAuth(string url, byte[] body, VideoContentType videoType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostVideo.PostVideoForTexture(url, body, videoType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>Video 데이터를 POST 요청으로 전송하며 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostVideoForImage(string url, byte[] body, VideoContentType videoType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostVideo.PostVideoForImage(url, body, videoType, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostVideoForTexture(string url, byte[] body, VideoContentType videoType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostVideo.PostVideoForTexture(url, body, videoType, onProgress, headers, cancelToken);
 
 		#endregion
 
@@ -401,12 +401,12 @@ namespace Suk.RestApi
 			=> await PostImage.PostImageForVideo(url, body, imageType, savePath, onProgress, headers, cancelToken);
 
 		/// <summary>Image 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostImageForImageWithAuth(string url, byte[] body, ImageContentType imageType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostImage.PostImageForImage(url, body, imageType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+		public static async UniTask<Texture2D> PostImageForTextureWithAuth(string url, byte[] body, ImageContentType imageType, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostImage.PostImageForTexture(url, body, imageType, onProgress, SetAuthHeader(headers, authToken), cancelToken);
 
 		/// <summary>Image 데이터를 POST 요청으로 전송하며 이미지 응답을 처리합니다.</summary>
-		public static async UniTask<Texture2D> PostImageForImage(string url, byte[] body, ImageContentType imageType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
-			=> await PostImage.PostImageForImage(url, body, imageType, onProgress, headers, cancelToken);
+		public static async UniTask<Texture2D> PostImageForTexture(string url, byte[] body, ImageContentType imageType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+			=> await PostImage.PostImageForTexture(url, body, imageType, onProgress, headers, cancelToken);
 
 		#endregion
 
