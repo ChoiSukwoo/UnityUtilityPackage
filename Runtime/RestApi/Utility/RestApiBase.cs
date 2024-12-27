@@ -12,23 +12,6 @@ namespace Suk.RestApi
 {
 	internal static class RestApiBase
 	{
-		/// <summary>
-		/// 비동기적으로 HTTP GET 요청을 수행하는 유틸리티 함수.
-		/// UnityWebRequest를 사용하며 UniTask를 기반으로 요청 진행률, 헤더 설정, 콘텐츠 유형 검증 및 응답 처리 기능을 제공합니다.
-		/// </summary>
-		/// <typeparam name="T">응답 데이터를 변환할 타입</typeparam>
-		/// <param name="url">요청할 URL</param>
-		/// <param name="onProgress">요청 진행률을 반환하는 콜백 (옵션)</param>
-		/// <param name="headers">요청 헤더를 설정할 딕셔너리 (옵션)</param>
-		/// <param name="expectedType">
-		/// 응답에서 예상하는 콘텐츠 유형 (기본값: ContentTypeState.Unknown).
-		/// **경고:** `ContentTypeState.Unknown` 상태로 실행하면 Content-Type이 검증되지 않으며,
-		/// 서버의 Content-Type 헤더가 비정상적인 경우 예외가 발생할 수 있습니다.
-		/// 올바른 ContentTypeState 값을 지정하는 것이 권장됩니다.
-		/// </param>
-		/// <param name="audioType">오디오 데이터인 경우의 AudioType (기본값: AudioType.UNKNOWN)</param>
-		/// <param name="cancellationToken">요청을 취소하기 위한 CancellationToken (옵션)</param>
-		/// <returns>응답 데이터를 지정된 타입으로 반환하는 UniTask</returns>
 		public static async UniTask<T> Get<T>(string url, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, ContentTypeState expectedType = ContentTypeState.Unknown, CancellationToken cancellationToken = default)
 		{
 			using (UnityWebRequest request = UnityWebRequest.Get(url))
