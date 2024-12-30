@@ -407,7 +407,106 @@ namespace Suk.RestApi
 		/// <summary>Image 데이터를 POST 요청으로 전송하며 이미지 응답을 처리합니다.</summary>
 		public static async UniTask<Texture2D> PostImageForTexture(string url, byte[] body, ImageContentType imageType, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 			=> await PostImage.PostImageForTexture(url, body, imageType, onProgress, headers, cancelToken);
+		#endregion
 
+		#region PostMultiform
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 텍스트 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostMultiformForTextWithAuth(string url, MultipartFormData formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForText(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 텍스트 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostMultiformForText(string url, MultipartFormData formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForText(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 JSON 응답을 처리합니다.</summary>
+		public static async UniTask<Res> PostMultiformForJsonWithAuth<Res>(string url, MultipartFormData formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForJson<Res>(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 JSON 응답을 처리합니다.</summary>
+		public static async UniTask<Res> PostMultiformForJson<Res>(string url, MultipartFormData formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForJson<Res>(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 바이너리 응답을 처리합니다.</summary>
+		public static async UniTask<byte[]> PostMultiformForBinaryWithAuth(string url, MultipartFormData formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForBinary(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 바이너리 응답을 처리합니다.</summary>
+		public static async UniTask<byte[]> PostMultiformForBinary(string url, MultipartFormData formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForBinary(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 오디오 응답을 처리합니다.</summary>
+		public static async UniTask<AudioClip> PostMultiformForAudioWithAuth(string url, MultipartFormData formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForAudio(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 오디오 응답을 처리합니다.</summary>
+		public static async UniTask<AudioClip> PostMultiformForAudio(string url, MultipartFormData formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForAudio(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 비디오 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostMultiformForVideoWithAuth(string url, MultipartFormData formData, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForVideo(url, formData, savePath, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 비디오 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostMultiformForVideo(string url, MultipartFormData formData, string savePath, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForVideo(url, formData, savePath, onProgress, headers, cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 이미지 응답을 처리합니다.</summary>
+		public static async UniTask<Texture2D> PostMultiformForTextureWithAuth(string url, MultipartFormData formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForTexture(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>Multipart 데이터를 POST 요청으로 전송하며 이미지 응답을 처리합니다.</summary>
+		public static async UniTask<Texture2D> PostMultiformForTexture(string url, MultipartFormData formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostMultiform.PostMultiformForTexture(url, formData, onProgress, headers, cancelToken);
+		#endregion
+
+		#region PostUrlEncoded
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 텍스트 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostUrlEncodedForTextWithAuth(string url, Dictionary<string, string> formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForText(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 텍스트 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostUrlEncodedForText(string url, Dictionary<string, string> formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForText(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 JSON 응답을 처리합니다.</summary>
+		public static async UniTask<Res> PostUrlEncodedForJsonWithAuth<Res>(string url, Dictionary<string, string> formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForJson<Res>(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 JSON 응답을 처리합니다.</summary>
+		public static async UniTask<Res> PostUrlEncodedForJson<Res>(string url, Dictionary<string, string> formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForJson<Res>(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 바이너리 응답을 처리합니다.</summary>
+		public static async UniTask<byte[]> PostUrlEncodedForBinaryWithAuth(string url, Dictionary<string, string> formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForBinary(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 바이너리 응답을 처리합니다.</summary>
+		public static async UniTask<byte[]> PostUrlEncodedForBinary(string url, Dictionary<string, string> formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForBinary(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 오디오 응답을 처리합니다.</summary>
+		public static async UniTask<AudioClip> PostUrlEncodedForAudioWithAuth(string url, Dictionary<string, string> formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForAudio(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 오디오 응답을 처리합니다.</summary>
+		public static async UniTask<AudioClip> PostUrlEncodedForAudio(string url, Dictionary<string, string> formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForAudio(url, formData, onProgress, headers, cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 비디오 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostUrlEncodedForVideoWithAuth(string url, Dictionary<string, string> formData, string savePath, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForVideo(url, formData, savePath, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 비디오 응답을 처리합니다.</summary>
+		public static async UniTask<string> PostUrlEncodedForVideo(string url, Dictionary<string, string> formData, string savePath, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForVideo(url, formData, savePath, onProgress, headers, cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 인증 헤더를 추가하고 이미지 응답을 처리합니다.</summary>
+		public static async UniTask<Texture2D> PostUrlEncodedForTextureWithAuth(string url, Dictionary<string, string> formData, string authToken, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForTexture(url, formData, onProgress, SetAuthHeader(headers, authToken), cancelToken);
+
+		/// <summary>UrlEncoded 데이터를 POST 요청으로 전송하며 이미지 응답을 처리합니다.</summary>
+		public static async UniTask<Texture2D> PostUrlEncodedForTexture(string url, Dictionary<string, string> formData, UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
+		=> await PostUrlEncoded.PostUrlEncodedForTexture(url, formData, onProgress, headers, cancelToken);
 		#endregion
 
 		#region Utility
