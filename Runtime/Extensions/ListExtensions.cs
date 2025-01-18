@@ -59,6 +59,16 @@ namespace Suk.Util.Extensions
             action(list[i], i);
          }
       }
+      
+      /// <summary>리스트에서 랜덤한 요소를 가져옵니다.</summary>
+      public static T GetRandomElement<T>(this List<T> list)
+      {
+         if (list == null || list.Count == 0) 
+            return default;
+         
+         int randomIndex = UnityEngine.Random.Range(0, list.Count);
+         return list[randomIndex];
+      }
    }
 
 }
