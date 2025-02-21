@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Suk.BinaryUtility;
-using Suk.Json;
+using Suk.Utility.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -14,7 +14,7 @@ namespace Suk.RestApi
 {
 	internal static class RestApiUtility
 	{
-		/// <summary> ÀÎÁõ ÅäÅ«À» ¼³Á¤ÇÑ »õ Çì´õ¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù </summary>
+		/// <summary> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½ </summary>
 		public static Dictionary<string, string> SetAuthHeader(Dictionary<string, string> headers, string authToken)
 		{
 			var newHeaders = headers != null ? new Dictionary<string, string>(headers) : new Dictionary<string, string>();
@@ -22,7 +22,7 @@ namespace Suk.RestApi
 			return newHeaders;
 		}
 
-		/// <summary> Content-Type Çì´õ¸¦ ¼³Á¤ÇÑ »õ Çì´õ¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù </summary>
+		/// <summary> Content-Type ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½ </summary>
 		public static Dictionary<string, string> SetContentHeader(Dictionary<string, string> headers, string contentType)
 		{
 			var newHeaders = headers != null ? new Dictionary<string, string>(headers) : new Dictionary<string, string>();
@@ -30,20 +30,20 @@ namespace Suk.RestApi
 			return newHeaders;
 		}
 
-		/// <summary> UnityWebRequest °´Ã¼¿¡ ÁöÁ¤µÈ Çì´õ °ªÀ» ¼³Á¤ÇÕ´Ï´Ù. </summary>
+		/// <summary> UnityWebRequest ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static void SetRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
 		{
-			//header °¡ ¾øÀ»½Ã Ã³¸®ÇÒ°Ô ¾øÀ½
+			//header ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ò°ï¿½ ï¿½ï¿½ï¿½ï¿½
 			if (headers == null)
 				return;
-			//Çì´õ°ªÀ» request¿¡ µî·Ï
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ requestï¿½ï¿½ ï¿½ï¿½ï¿½
 			foreach ((string key, string value) in headers)
 			{
 				request.SetRequestHeader(key, value);
 			}
 		}
 
-		/// <summary> URL ¹× ÄÁÅÙÃ÷ À¯Çü¿¡ µû¶ó ÀûÇÕÇÑ DownloadHandler¸¦ »ý¼ºÇÕ´Ï´Ù. </summary>
+		/// <summary> URL ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ DownloadHandlerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static DownloadHandler CreateDownloadHandler(string url, ContentTypeState expectedType)
 		{
 			switch (expectedType)
@@ -53,19 +53,19 @@ namespace Suk.RestApi
 				case ContentTypeState.Asset:
 					return new DownloadHandlerAssetBundle(url, 0);
 				default:
-					return new DownloadHandlerBuffer(); // ±âº» ÇÚµé·¯
+					return new DownloadHandlerBuffer(); // ï¿½âº» ï¿½Úµé·¯
 			}
 		}
 
-		/// <summary>  UnityWebRequestÀÇ Content-Type Çì´õ¸¦ ±â¹ÝÀ¸·Î ¿¹»óµÇ´Â ContentTypeState¸¦ °ËÁõÇÕ´Ï´Ù. </summary>
+		/// <summary>  UnityWebRequestï¿½ï¿½ Content-Type ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ContentTypeStateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static bool ValidateContentType(UnityWebRequest request, ref ContentTypeState expectedType)
 		{
-			// ¿¹»ó À¯ÇüÀÌ UnknownÀÌ¸é Content-TypeÀ» È®ÀÎÇÏ¿© °»½Å
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Unknownï¿½Ì¸ï¿½ Content-Typeï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½
 			if (expectedType == ContentTypeState.Unknown)
 			{
 				string contentType = request.GetResponseHeader("Content-Type");
 
-				// Content-TypeÀÌ ºñ¾îÀÖ°Å³ª À¯È¿ÇÏÁö ¾ÊÀ¸¸é false ¹ÝÈ¯
+				// Content-Typeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ö°Å³ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ false ï¿½ï¿½È¯
 				if (string.IsNullOrEmpty(contentType) || !TryParseContentType(contentType, out expectedType))
 					return false;
 			}
@@ -76,11 +76,11 @@ namespace Suk.RestApi
 		{
 			contentTypeId = ContentTypeState.Unknown;
 
-			// Content-TypeÀÌ nullÀÌ°Å³ª ºñ¾î ÀÖ´Â °æ¿ì
+			// Content-Typeï¿½ï¿½ nullï¿½Ì°Å³ï¿½ ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
 			if (string.IsNullOrEmpty(contentType))
 				return false;
 
-			// Content-TypeÀÇ ¸ÞÀÎ Å¸ÀÔÀ» ÆÄ½Ì
+			// Content-Typeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½Ä½ï¿½
 			string mainType = contentType.Split(';')[0].Trim().ToLower();
 
 			if (mainType.StartsWith("text/") || mainType.Contains("json") || mainType.Contains("xml"))
@@ -99,7 +99,7 @@ namespace Suk.RestApi
 			return true;
 		}
 
-		/// <summary> UnityWebRequest ÀÀ´ä µ¥ÀÌÅÍ¸¦ ¿¹»óµÈ ContentTypeState¿¡ µû¶ó ÆÄ½ÌÇÕ´Ï´Ù. </summary>
+		/// <summary> UnityWebRequest ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ContentTypeStateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static async UniTask<T> ParseResponse<T>(UnityWebRequest request, ContentTypeState expectedType, string contentType)
 		{
 
@@ -110,38 +110,38 @@ namespace Suk.RestApi
 			{
 				case ContentTypeState.Image:
 					if (typeof(T) != typeof(Texture2D))
-						throw new InvalidCastException($"ContentTypeState.Image´Â Texture2D·Î ¿¹»óµÇÁö¸¸, {typeof(T).Name}·Î ÆÄ½ÌÀ» ½ÃµµÇÏ¿´½À´Ï´Ù.");
+						throw new InvalidCastException($"ContentTypeState.Imageï¿½ï¿½ Texture2Dï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, {typeof(T).Name}ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 					return (T)(object)DownloadHandlerTexture.GetContent(request);
 
 				case ContentTypeState.Audio:
 					if (typeof(T) != typeof(AudioClip))
-						throw new InvalidCastException($"ContentTypeState.Audio´Â AudioClipÀ¸·Î ¿¹»óµÇÁö¸¸, {typeof(T).Name}·Î ÆÄ½ÌÀ» ½ÃµµÇÏ¿´½À´Ï´Ù.");
+						throw new InvalidCastException($"ContentTypeState.Audioï¿½ï¿½ AudioClipï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, {typeof(T).Name}ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 					byte[] audioData = request.downloadHandler.data;
 					AudioType unityAudioType = GetAudioTypeFromContentType(contentType);
 					return (T)(object)await AudioFileUtility.CreateAudioClipAsync(audioData, unityAudioType);
 
 				case ContentTypeState.Asset:
 					if (typeof(T) != typeof(AssetBundle))
-						throw new InvalidCastException($"ContentTypeState.Asset´Â AssetBundle·Î ¿¹»óµÇÁö¸¸, {typeof(T).Name}·Î ÆÄ½ÌÀ» ½ÃµµÇÏ¿´½À´Ï´Ù.");
+						throw new InvalidCastException($"ContentTypeState.Assetï¿½ï¿½ AssetBundleï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, {typeof(T).Name}ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 					return (T)(object)DownloadHandlerAssetBundle.GetContent(request);
 
 				case ContentTypeState.Text:
 					if (typeof(T) != typeof(string))
-						throw new InvalidCastException($"ContentTypeState.Text´Â stringÀ¸·Î ¿¹»óµÇÁö¸¸, {typeof(T).Name}·Î ÆÄ½ÌÀ» ½ÃµµÇÏ¿´½À´Ï´Ù.");
+						throw new InvalidCastException($"ContentTypeState.Textï¿½ï¿½ stringï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, {typeof(T).Name}ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 					return (T)(object)request.downloadHandler.text;
 
 				case ContentTypeState.Binary:
 				case ContentTypeState.Video:
 					if (typeof(T) != typeof(byte[]))
-						throw new InvalidCastException($"ContentTypeState.Binary ¶Ç´Â ContentTypeState.Video´Â byte[]·Î ¿¹»óµÇÁö¸¸, {typeof(T).Name}·Î ÆÄ½ÌÀ» ½ÃµµÇÏ¿´½À´Ï´Ù.");
+						throw new InvalidCastException($"ContentTypeState.Binary ï¿½Ç´ï¿½ ContentTypeState.Videoï¿½ï¿½ byte[]ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, {typeof(T).Name}ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 					return (T)(object)request.downloadHandler.data;
 
 				default:
-					throw new Exception($"Áö¿øµÇÁö ¾Ê´Â ContentTypeState: {expectedType}");
+					throw new Exception($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ContentTypeState: {expectedType}");
 			}
 		}
 
-		/// <summary>UnityWebRequest ÁøÇà »óÅÂ¸¦ ºñµ¿±â·Î ¾÷µ¥ÀÌÆ®ÇÕ´Ï´Ù. </summary>
+		/// <summary>UnityWebRequest ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ñµ¿±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½Õ´Ï´ï¿½. </summary>
 		public static async UniTask UpdateProgress(UnityWebRequestAsyncOperation asyncOperation, UnityAction<float> progress = null, CancellationToken token = default)
 		{
 			float lastProgress = 0f;
@@ -153,22 +153,22 @@ namespace Suk.RestApi
 				{
 					if (Time.time >= lastProgressUpdate + RestApiState.minUpdateInterval || Mathf.Abs(asyncOperation.progress - lastProgress) >= RestApiState.minProgressChange)
 					{
-						progress?.Invoke(asyncOperation.progress); // ÁøÇà·ü ¾÷µ¥ÀÌÆ®
+						progress?.Invoke(asyncOperation.progress); // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 						lastProgress = asyncOperation.progress;
 						lastProgressUpdate = Time.time;
 					}
 
-					// ÇÁ·¹ÀÓ ´ë±â (Ãë¼Ò ÅäÅ« Áö¿ø)
+					// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ ï¿½ï¿½Å« ï¿½ï¿½ï¿½ï¿½)
 					await UniTask.Yield(PlayerLoopTiming.Update, token);
 				}
 			}
 			catch (OperationCanceledException ex)
 			{
-				throw new OperationCanceledException($"Operation canceled ¹ß»ý [UpdateProgress] ÀÛ¾÷ÀÌ Ãë¼Ò µÇ¾ú½À´Ï´Ù.\n{ex.Message}", ex);
+				throw new OperationCanceledException($"Operation canceled ï¿½ß»ï¿½ [UpdateProgress] ï¿½Û¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"API¸¦ ÅëÇÑ µ¥ÀÌÅÍ ´Ù¿î·Îµå ÀÛ¾÷ Áß ¿À·ù ¹ß»ý\n {ex.Message}", ex);
+				throw new Exception($"APIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¿ï¿½Îµï¿½ ï¿½Û¾ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½\n {ex.Message}", ex);
 			}
 
 			progress?.Invoke(1f);
@@ -182,11 +182,11 @@ namespace Suk.RestApi
 
 		public static byte[] ConvertDictionaryToBytes(Dictionary<string, string> body)
 		{
-			// ´Ü°è 2: FormData º¯È¯
+			// ï¿½Ü°ï¿½ 2: FormData ï¿½ï¿½È¯
 			if (body == null || body.Count == 0)
 				throw new ArgumentException("Form data cannot be null or empty.");
 
-			// Key-Value ½ÖÀ» ÀÎÄÚµùÇÏ¿© List<string>¿¡ ÀúÀå
+			// Key-Value ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ï¿½Ï¿ï¿½ List<string>ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			List<string> encodedDataParts = new List<string>();
 			foreach (var (key, value) in body)
 			{
@@ -195,23 +195,23 @@ namespace Suk.RestApi
 				encodedDataParts.Add($"{encodedKey}={encodedValue}");
 			}
 
-			// Á¶ÇÕµÈ ¹®ÀÚ¿­À» »ý¼º
+			// ï¿½ï¿½ï¿½Õµï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			string encodedDataString = string.Join("&", encodedDataParts);
 
-			// UTF8 ¹ÙÀÌÆ® ¹è¿­·Î º¯È¯
+			// UTF8 ï¿½ï¿½ï¿½ï¿½Æ® ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½È¯
 			return Encoding.UTF8.GetBytes(encodedDataString);
 		}
 		#endregion
 
 		#region Handler
-		/// <summary> JSON ÀÀ´ä µ¥ÀÌÅÍ¸¦ ÁöÁ¤µÈ Á¦³×¸¯ Å¸ÀÔÀ¸·Î ÆÄ½ÌÇÕ´Ï´Ù. </summary>
+		/// <summary> JSON ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static T HandleJsonResponse<T>(string jsonResponse)
 		{
-			var parsedData = JsonParser.Parse<T>(jsonResponse);
+			var parsedData = JsonParser.Parsing<T>(jsonResponse);
 			return parsedData;
 		}
 
-		/// <summary> ºñµð¿À µ¥ÀÌÅÍ¸¦ ÆÄÀÏ·Î ÀúÀåÇÕ´Ï´Ù. </summary>
+		/// <summary> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½Ï·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static async UniTask<string> HandleVideoResponse(byte[] videoData, string savePath, CancellationToken cancellationToken = default)
 		{
 			if (videoData == null || videoData.Length == 0)
@@ -219,158 +219,158 @@ namespace Suk.RestApi
 
 			ValidatePath(savePath);
 
-			// BinaryUtility¸¦ »ç¿ëÇØ ºñµ¿±â·Î ÆÄÀÏ ÀúÀå
+			// BinaryUtilityï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ñµ¿±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			await BinaryFileUtility.SaveBytesToFileAsync(videoData, savePath, cancellationToken);
 			if (RestApiState.enableDebugLog)
 				Debug.Log($"[RestApiUtility] HandleVideoResponse\nVideo saved successfully at: {savePath}");
 			return savePath;
 		}
 
-		/// <summary> JSON¸¦ ¹ÙÀÌÆ® ¹è¿­·Î º¯È¯ÇÏ¿© ¹ÝÈ¯ÇÕ´Ï´Ù. </summary>
+		/// <summary> JSONï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï¿ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½. </summary>
 		public static byte[] HandleJsonBody<T>(T body)
 		{
 			if (body == null)
-				throw new ArgumentNullException(nameof(body), "Body °´Ã¼°¡ nullÀÔ´Ï´Ù.");
+				throw new ArgumentNullException(nameof(body), "Body ï¿½ï¿½Ã¼ï¿½ï¿½ nullï¿½Ô´Ï´ï¿½.");
 
-			byte[] bodyData = JsonParser.ToByteArray(body);
+			byte[] bodyData = JsonParser.SerializeToByteArray(body);
 			return bodyData;
 		}
 		#endregion
 
 		#region MediaTypeConvert
-		/// <summary> AudioContentType¿¡¼­ Content-TypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> AudioContentTypeï¿½ï¿½ï¿½ï¿½ Content-Typeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static string GetContentTypeFromAudioContentType(AudioContentType contentType)
 		{
 			if (RestApiModel.AudioContentTypeToContentType.TryGetByKey(contentType, out string type))
 				return type;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â AudioContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AudioContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> Content-Type¿¡¼­ AudioContentTypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> Content-Typeï¿½ï¿½ï¿½ï¿½ AudioContentTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static AudioContentType GetAudioContentTypeFromContentType(string contentType)
 		{
 			if (RestApiModel.AudioContentTypeToContentType.TryGetByValue(contentType, out AudioContentType audioContentType))
 				return audioContentType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â ¿Àµð¿À string ContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ string ContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> AudioContentType¿¡¼­ Unity AudioTypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> AudioContentTypeï¿½ï¿½ï¿½ï¿½ Unity AudioTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static AudioType GetAudioTypeFromAudioContentType(AudioContentType contentType)
 		{
 			if (RestApiModel.AudioContentTypeToAudioType.TryGetByKey(contentType, out AudioType audioType))
 				return audioType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â AudioContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AudioContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> Unity AudioType¿¡¼­ AudioContentTypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> Unity AudioTypeï¿½ï¿½ï¿½ï¿½ AudioContentTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static AudioContentType GetAudioContentTypeFromAudioType(AudioType audioType)
 		{
 			if (RestApiModel.AudioContentTypeToAudioType.TryGetByValue(audioType, out AudioContentType contentType))
 				return contentType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â AudioType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AudioType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> Content-Type¿¡¼­ Unity AudioTypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> Content-Typeï¿½ï¿½ï¿½ï¿½ Unity AudioTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static AudioType GetAudioTypeFromContentType(string contentType)
 		{
 			if (RestApiModel.ContentTypeToAudioType.TryGetByKey(contentType, out AudioType audioType))
 				return audioType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â ¿Àµð¿À string ContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ string ContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> Unity AudioType¿¡¼­ Content-TypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> Unity AudioTypeï¿½ï¿½ï¿½ï¿½ Content-Typeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static string GetContentTypeFromAudioType(AudioType audioType)
 		{
 			if (RestApiModel.ContentTypeToAudioType.TryGetByValue(audioType, out string contentType))
 				return contentType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â AudioType : {audioType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AudioType : {audioType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> VideoContentType¿¡¼­ Content-Type(MIME Type)À» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> VideoContentTypeï¿½ï¿½ï¿½ï¿½ Content-Type(MIME Type)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static string GetContentTypeFromVideoContentType(VideoContentType contentType)
 		{
 			if (RestApiModel.VideoContentTypeToContentType.TryGetByKey(contentType, out string type))
 				return type;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â VideoContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ VideoContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> Content-Type(MIME Type)¿¡¼­ VideoContentTypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> Content-Type(MIME Type)ï¿½ï¿½ï¿½ï¿½ VideoContentTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static VideoContentType GetVideoContentTypeFromContentType(string contentType)
 		{
 			if (RestApiModel.VideoContentTypeToContentType.TryGetByValue(contentType, out VideoContentType videoContentType))
 				return videoContentType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â ºñµð¿À string ContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ string ContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> ImageContentType¿¡¼­ Content-Type(MIME Type)À» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> ImageContentTypeï¿½ï¿½ï¿½ï¿½ Content-Type(MIME Type)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static string GetContentTypeFromImageContentType(ImageContentType contentType)
 		{
 			if (RestApiModel.ImageContentTypeToContentType.TryGetByKey(contentType, out string type))
 				return type;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â ImageContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ImageContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary> Content-Type(MIME Type)¿¡¼­ ImageContentTypeÀ» ÃßÃâÇÕ´Ï´Ù. </summary>
+		/// <summary> Content-Type(MIME Type)ï¿½ï¿½ï¿½ï¿½ ImageContentTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. </summary>
 		public static ImageContentType GetImageContentTypeFromContentType(string contentType)
 		{
 			if (RestApiModel.ImageContentTypeToContentType.TryGetByValue(contentType, out ImageContentType imageContentType))
 				return imageContentType;
 
-			throw new NotSupportedException($"[RestApiUtility] ¿¡¼­´Â ÀÌ¹ÌÁö string ContentType : {contentType} Å¸ÀÔÀ» Áö¿øÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new NotSupportedException($"[RestApiUtility] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ string ContentType : {contentType} Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
 		}
 		#endregion
 
 		#region Validate
-		/// <summary>URL À¯È¿¼º °Ë»ç</summary>
+		/// <summary>URL ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½</summary>
 		public static void ValidateUrl(string url)
 		{
 			if (string.IsNullOrWhiteSpace(url))
-				throw new ArgumentNullException(nameof(url), "URLÀÌ nullÀÌ°Å³ª ºñ¾î ÀÖ½À´Ï´Ù.");
+				throw new ArgumentNullException(nameof(url), "URLï¿½ï¿½ nullï¿½Ì°Å³ï¿½ ï¿½ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½.");
 			if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-				throw new ArgumentException("À¯È¿ÇÏÁö ¾ÊÀº URL Çü½ÄÀÔ´Ï´Ù.", nameof(url));
+				throw new ArgumentException("ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ URL ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.", nameof(url));
 		}
 
-		/// <summary>Content-Type À¯È¿¼º °Ë»ç</summary>
+		/// <summary>Content-Type ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½</summary>
 		public static void ValidateContentType(string contentType)
 		{
 			if (string.IsNullOrWhiteSpace(contentType))
-				throw new ArgumentNullException(nameof(contentType), "Content-TypeÀÌ nullÀÌ°Å³ª ºñ¾î ÀÖ½À´Ï´Ù.");
+				throw new ArgumentNullException(nameof(contentType), "Content-Typeï¿½ï¿½ nullï¿½Ì°Å³ï¿½ ï¿½ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½.");
 		}
 
-		/// <summary>Body À¯È¿¼º °Ë»ç</summary>
+		/// <summary>Body ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½</summary>
 		public static void ValidateBody(byte[] body)
 		{
 			if (body == null)
-				throw new ArgumentNullException(nameof(body), "¿äÃ» ¹Ùµð°¡ nullÀÔ´Ï´Ù.");
+				throw new ArgumentNullException(nameof(body), "ï¿½ï¿½Ã» ï¿½Ùµï¿½ nullï¿½Ô´Ï´ï¿½.");
 		}
 
-		/// <summary>Path À¯È¿¼º °Ë»ç</summary>
+		/// <summary>Path ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½</summary>
 		public static void ValidatePath(string savePath)
 		{
 			if (string.IsNullOrWhiteSpace(savePath))
 				throw new ArgumentException(nameof(savePath), $"path url cannot be null or empty. : {savePath}");
 
-			// 'file://' URL Ã³¸®
+			// 'file://' URL Ã³ï¿½ï¿½
 			if (Uri.TryCreate(savePath, UriKind.Absolute, out Uri uri) && uri.IsFile)
-				savePath = uri.LocalPath; // 'file:///' URLÀ» ·ÎÄÃ ÆÄÀÏ °æ·Î·Î º¯È¯
+				savePath = uri.LocalPath; // 'file:///' URLï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î·ï¿½ ï¿½ï¿½È¯
 
-			// °æ·Î°¡ Àý´ë °æ·ÎÀÎÁö È®ÀÎ
+			// ï¿½ï¿½Î°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 			if (!Path.IsPathRooted(savePath))
 				throw new ArgumentException($"The path is not a valid absolute path. Given path: {savePath}");
 
 		}
 		#endregion
 
-		/// <summary>°øÅë ¿¹¿Ü ·Î±ë ÇÔ¼ö</summary>
+		/// <summary>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î±ï¿½ ï¿½Ô¼ï¿½</summary>
 		public static async UniTask<T> ErrorLogging<T>(Func<UniTask<T>> taskFunc)
 		{
 			try
@@ -379,17 +379,17 @@ namespace Suk.RestApi
 			}
 			catch (OperationCanceledException ex)
 			{
-				// Ãë¼Ò ¿¹¿Ü¸¦ ·Î±× ³»¿ë Æ÷ÇÔÇÑ »õ ¿¹¿Ü·Î »óÀ§¿¡ Àü´Þ
-				throw new OperationCanceledException($"[RestApi] Operation canceled ¹ß»ý ÀÛ¾÷ÀÌ Ãë¼Ò µÇ¾ú½À´Ï´Ù.\n{ex.Message}", ex);
+				// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ü¸ï¿½ ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ü·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+				throw new OperationCanceledException($"[RestApi] Operation canceled ï¿½ß»ï¿½ ï¿½Û¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.\n{ex.Message}", ex);
 			}
 			catch (Exception ex)
 			{
-				// ÀÏ¹Ý ¿¹¿Ü¸¦ ·Î±× ³»¿ë Æ÷ÇÔÇÑ »õ ¿¹¿Ü·Î »óÀ§¿¡ Àü´Þ
-				throw new Exception($"[RestApi] Exception ¹ß»ý\n{ex.Message}", ex);
+				// ï¿½Ï¹ï¿½ ï¿½ï¿½ï¿½Ü¸ï¿½ ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ü·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+				throw new Exception($"[RestApi] Exception ï¿½ß»ï¿½\n{ex.Message}", ex);
 			}
 		}
 
-		/// <summary> NÈ¸ Àç½Ãµµ °¡´ÉÇÑ °íÂ÷ ÇÔ¼ö </summary>
+		/// <summary> NÈ¸ ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ </summary>
 		public static async UniTask<T> RetryAsync<T>(Func<UniTask<T>> taskFactory, int retryCount = -1, float retryDelay = 1.0f)
 		{
 			int currentRetry = 1;
@@ -418,7 +418,7 @@ namespace Suk.RestApi
 			}
 		}
 
-		/// <summary> ÆÄÀÏ °æ·Î¿¡¼­ ÀÌ¹ÌÁö Å¸ÀÔÀ» ¹ÝÈ¯ÇÕ´Ï´Ù. </summary>
+		/// <summary> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½. </summary>
 		public static ImageContentType GetImageContentType(string filePath)
 		{
 			if (string.IsNullOrEmpty(filePath))
@@ -434,7 +434,7 @@ namespace Suk.RestApi
 			};
 		}
 
-		/// <summary> ÆÄÀÏ °æ·Î¿¡¼­ ¿Àµð¿À Å¸ÀÔÀ» ¹ÝÈ¯ÇÕ´Ï´Ù. </summary>
+		/// <summary> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½. </summary>
 		public static AudioContentType GetAudioContentType(string filePath)
 		{
 			if (string.IsNullOrEmpty(filePath))
@@ -450,7 +450,7 @@ namespace Suk.RestApi
 			};
 		}
 
-		/// <summary> ÆÄÀÏ °æ·Î¿¡¼­ ºñµð¿À Å¸ÀÔÀ» ¹ÝÈ¯ÇÕ´Ï´Ù. </summary>
+		/// <summary> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½. </summary>
 		public static VideoContentType GetVideoContentType(string filePath)
 		{
 			if (string.IsNullOrEmpty(filePath))

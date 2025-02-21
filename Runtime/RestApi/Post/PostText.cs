@@ -12,13 +12,13 @@ namespace Suk
 	internal static class PostText
 	{
 
-		/// <summary>´Ü¼ø Text µ¥ÀÌÅÍ¸¦ POST ¿äÃ»À¸·Î Àü¼ÛÇÏ°í ÅØ½ºÆ® ÀÀ´äÀ» Ã³¸®ÇÕ´Ï´Ù.</summary>
+		/// <summary>ï¿½Ü¼ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ POST ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
 		public static async UniTask<string> PostTextForText(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(() => PostTextAsync<string>(url, body, ContentTypeState.Text, contentType, onProgress, headers, cancelToken));
 		}
 
-		/// <summary>´Ü¼ø Text µ¥ÀÌÅÍ¸¦ POST ¿äÃ»À¸·Î Àü¼ÛÇÏ°í JSON ÀÀ´äÀ» Ã³¸®ÇÕ´Ï´Ù.</summary>
+		/// <summary>ï¿½Ü¼ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ POST ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ JSON ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
 		public static async UniTask<Res> PostTextForJson<Res>(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(async () =>
@@ -28,19 +28,19 @@ namespace Suk
 			});
 		}
 
-		/// <summary>´Ü¼ø Text µ¥ÀÌÅÍ¸¦ POST ¿äÃ»À¸·Î Àü¼ÛÇÏ°í ¹ÙÀÌ³Ê¸® ÀÀ´äÀ» Ã³¸®ÇÕ´Ï´Ù.</summary>
+		/// <summary>ï¿½Ü¼ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ POST ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½Ì³Ê¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
 		public static async UniTask<byte[]> PostTextForBinary(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(() => PostTextAsync<byte[]>(url, body, ContentTypeState.Binary, contentType, onProgress, headers, cancelToken));
 		}
 
-		/// <summary>´Ü¼ø Text µ¥ÀÌÅÍ¸¦ POST ¿äÃ»À¸·Î Àü¼ÛÇÏ°í ¿Àµð¿À ÀÀ´äÀ» Ã³¸®ÇÕ´Ï´Ù.</summary>
+		/// <summary>ï¿½Ü¼ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ POST ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
 		public static async UniTask<AudioClip> PostTextForAudio(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(() => PostTextAsync<AudioClip>(url, body, ContentTypeState.Audio, contentType, onProgress, headers, cancelToken));
 		}
 
-		/// <summary>´Ü¼ø Text µ¥ÀÌÅÍ¸¦ POST ¿äÃ»À¸·Î Àü¼ÛÇÏ°í ºñµð¿À ÀÀ´äÀ» Ã³¸®ÇÕ´Ï´Ù.</summary>
+		/// <summary>ï¿½Ü¼ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ POST ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
 		public static async UniTask<string> PostTextForVideo(string url, string body, string savePath, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(async () =>
@@ -50,23 +50,23 @@ namespace Suk
 			});
 		}
 
-		/// <summary>´Ü¼ø Text µ¥ÀÌÅÍ¸¦ POST ¿äÃ»À¸·Î Àü¼ÛÇÏ°í ÀÌ¹ÌÁö ÀÀ´äÀ» Ã³¸®ÇÕ´Ï´Ù.</summary>
+		/// <summary>ï¿½Ü¼ï¿½ Text ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ POST ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
 		public static async UniTask<Texture2D> PostTextForTexture(string url, string body, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
 			return await ErrorLogging(() => PostTextAsync<Texture2D>(url, body, ContentTypeState.Image, contentType, onProgress, headers, cancelToken));
 		}
 
-		/// <summary> PostText °øÅë Ã³¸® ÇÔ¼ö</summary>
+		/// <summary> PostText ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½Ô¼ï¿½</summary>
 		static async UniTask<T> PostTextAsync<T>(string url, string body, ContentTypeState expectContentType, string contentType = "", UnityAction<float> onProgress = null, Dictionary<string, string> headers = null, CancellationToken cancelToken = default)
 		{
-			//url °ËÁõ
+			//url ï¿½ï¿½ï¿½ï¿½
 			ValidateUrl(url);
 
-			//bodyData °ËÁõ
+			//bodyData ï¿½ï¿½ï¿½ï¿½
 			byte[] bodyData = ConvertTextToBytes(body);
 			ValidateBody(bodyData);
 
-			//Çì´õ Àû¿ë
+			//ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			headers = SetContentHeader(headers, string.IsNullOrEmpty(contentType) ? "text/plain" : contentType);
 
 			T postResult = await Post<T>(url, bodyData, onProgress, headers, expectContentType, cancelToken);

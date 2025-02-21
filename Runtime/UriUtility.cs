@@ -6,8 +6,8 @@ namespace Suk
 {
 	public static class UriUtility
 	{
-		/// <summary>URLÀ» ÆÄ½ÌÇÏ¿© Uri °´Ã¼¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù.</summary>
-		/// <returns>Uri °´Ã¼</returns>
+		/// <summary>URLï¿½ï¿½ ï¿½Ä½ï¿½ï¿½Ï¿ï¿½ Uri ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½.</summary>
+		/// <returns>Uri ï¿½ï¿½Ã¼</returns>
 		public static Uri ParseUri(string url)
 		{
 			if (Uri.TryCreate(url, UriKind.Absolute, out Uri uriResult))
@@ -16,12 +16,12 @@ namespace Suk
 			}
 			else
 			{
-				throw new UriFormatException("À¯È¿ÇÏÁö ¾ÊÀº URL Çü½ÄÀÔ´Ï´Ù.");
+				throw new UriFormatException("ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ URL ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
 			}
 		}
 
-		/// <summary>URLÀÇ Äõ¸® ¸Å°³º¯¼ö¸¦ µñ¼Å³Ê¸®·Î ¹ÝÈ¯ÇÕ´Ï´Ù.</summary>
-		/// <returns>Äõ¸® ¸Å°³º¯¼ö¸¦ ´ãÀº µñ¼Å³Ê¸®</returns>
+		/// <summary>URLï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å³Ê¸ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Õ´Ï´ï¿½.</summary>
+		/// <returns>ï¿½ï¿½ï¿½ï¿½ ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å³Ê¸ï¿½</returns>
 		public static Dictionary<string, string> GetQueryParameters(string url)
 		{
 			Uri uri = ParseUri(url);
@@ -31,7 +31,7 @@ namespace Suk
 			if (string.IsNullOrEmpty(query))
 				return queryParameters;
 
-			// '?' ¹®ÀÚ Á¦°Å
+			// '?' ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			query = query.TrimStart('?');
 
 			var pairs = query.Split('&');
@@ -49,8 +49,8 @@ namespace Suk
 			return queryParameters;
 		}
 
-		/// <summary>Æ¯Á¤ Äõ¸® ¸Å°³º¯¼öÀÇ °ªÀ» °¡Á®¿É´Ï´Ù.</summary>
-		/// <returns>¸Å°³º¯¼öÀÇ °ª, Á¸ÀçÇÏÁö ¾ÊÀ¸¸é Empty</returns>
+		/// <summary>Æ¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É´Ï´ï¿½.</summary>
+		/// <returns>ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Empty</returns>
 		public static string GetQueryParameter(string url, string parameter)
 		{
 			var parameters = GetQueryParameters(url);
@@ -59,16 +59,16 @@ namespace Suk
 			return string.Empty;
 		}
 
-		/// <summary>µñ¼Å³Ê¸®¸¦ ±â¹ÝÀ¸·Î URLÀ» »ý¼ºÇÕ´Ï´Ù.</summary>
-		/// <returns>»ý¼ºµÈ URL</returns>
+		/// <summary>ï¿½ï¿½Å³Ê¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ URLï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
+		/// <returns>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ URL</returns>
 		public static string BuildUrl(string baseUrl, Dictionary<string, string> parameters)
 		{
 			if (string.IsNullOrEmpty(baseUrl))
-				throw new ArgumentException("baseUrlÀº null ¶Ç´Â ºó ¹®ÀÚ¿­ÀÏ ¼ö ¾ø½À´Ï´Ù.", nameof(baseUrl));
+				throw new ArgumentException("baseUrlï¿½ï¿½ null ï¿½Ç´ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.", nameof(baseUrl));
 
 			UriBuilder uriBuilder = new UriBuilder(baseUrl);
 
-			// Äõ¸® ¹®ÀÚ¿­À» »ý¼ºÇÕ´Ï´Ù.
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
 			var queryParameters = new List<string>();
 			foreach (var param in parameters)
 			{
@@ -81,22 +81,22 @@ namespace Suk
 			return uriBuilder.ToString();
 		}
 
-		/// <summary>µñ¼Å³Ê¸®¸¦ ±â¹ÝÀ¸·Î URLÀ» »ý¼ºÇÕ´Ï´Ù.</summary>
-		/// <returns>»ý¼ºµÈ URL</returns>
+		/// <summary>ï¿½ï¿½Å³Ê¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ URLï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.</summary>
+		/// <returns>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ URL</returns>
 		public static string BuildUrl(string[] segments, Dictionary<string, string> parameters = null)
 		{
-			// ÆÄ¶ó¹ÌÅÍ °ËÁõ
+			// ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			if (segments == null || segments.Length == 0)
-				throw new ArgumentException("segments´Â ÃÖ¼Ò ÇÏ³ªÀÇ °ªÀÌ ÇÊ¿äÇÕ´Ï´Ù.", nameof(segments));
+				throw new ArgumentException("segmentsï¿½ï¿½ ï¿½Ö¼ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Õ´Ï´ï¿½.", nameof(segments));
 
-			// Ã¹ ¹øÂ° ¼¼±×¸ÕÆ®¸¦ baseUrl·Î ¼³Á¤
+			// Ã¹ ï¿½ï¿½Â° ï¿½ï¿½ï¿½×¸ï¿½Æ®ï¿½ï¿½ baseUrlï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			string baseUrl = segments[0].Trim();
 			if (string.IsNullOrEmpty(baseUrl))
-				throw new ArgumentException("Ã¹ ¹øÂ° ¼¼±×¸ÕÆ®(baseUrl)´Â null ¶Ç´Â ºó ¹®ÀÚ¿­ÀÏ ¼ö ¾ø½À´Ï´Ù.", nameof(segments));
+				throw new ArgumentException("Ã¹ ï¿½ï¿½Â° ï¿½ï¿½ï¿½×¸ï¿½Æ®(baseUrl)ï¿½ï¿½ null ï¿½Ç´ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.", nameof(segments));
 
 			UriBuilder uriBuilder = new UriBuilder(baseUrl);
 
-			// ³ª¸ÓÁö ¼¼±×¸ÕÆ®µéÀ» °æ·Î·Î Ãß°¡
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î·ï¿½ ï¿½ß°ï¿½
 			string combinedPath = uriBuilder.Path.TrimEnd('/');
 			for (int i = 1; i < segments.Length; i++)
 			{
@@ -107,7 +107,7 @@ namespace Suk
 
 			uriBuilder.Path = combinedPath;
 
-			// ÆÄ¶ó¹ÌÅÍ Ãß°¡
+			// ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 			if (parameters != null && parameters.Count > 0)
 			{
 				var query = string.Join("&", parameters.Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
@@ -120,18 +120,18 @@ namespace Suk
 
 		public static string BuildUrl(params string[] segments)
 		{
-			// ÆÄ¶ó¹ÌÅÍ °ËÁõ
+			// ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			if (segments == null || segments.Length == 0)
-				throw new ArgumentException("segments´Â ÃÖ¼Ò ÇÏ³ªÀÇ °ªÀÌ ÇÊ¿äÇÕ´Ï´Ù.", nameof(segments));
+				throw new ArgumentException("segmentsï¿½ï¿½ ï¿½Ö¼ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Õ´Ï´ï¿½.", nameof(segments));
 
-			// Ã¹ ¹øÂ° ¼¼±×¸ÕÆ®¸¦ baseUrl·Î ¼³Á¤
+			// Ã¹ ï¿½ï¿½Â° ï¿½ï¿½ï¿½×¸ï¿½Æ®ï¿½ï¿½ baseUrlï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			string baseUrl = segments[0].Trim();
 			if (string.IsNullOrEmpty(baseUrl))
-				throw new ArgumentException("Ã¹ ¹øÂ° ¼¼±×¸ÕÆ®(baseUrl)´Â null ¶Ç´Â ºó ¹®ÀÚ¿­ÀÏ ¼ö ¾ø½À´Ï´Ù.", nameof(segments));
+				throw new ArgumentException("Ã¹ ï¿½ï¿½Â° ï¿½ï¿½ï¿½×¸ï¿½Æ®(baseUrl)ï¿½ï¿½ null ï¿½Ç´ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.", nameof(segments));
 
 			UriBuilder uriBuilder = new UriBuilder(baseUrl);
 
-			// ³ª¸ÓÁö ¼¼±×¸ÕÆ®¸¦ °æ·Î·Î Ãß°¡
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½×¸ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Î·ï¿½ ï¿½ß°ï¿½
 			string combinedPath = uriBuilder.Path.TrimEnd('/');
 			for (int i = 1; i < segments.Length; i++)
 			{
@@ -144,22 +144,22 @@ namespace Suk
 			return uriBuilder.Uri.ToString();
 		}
 
-		/// <summary> URLÀ» ÀÎÄÚµùÇÕ´Ï´Ù. (Æ¯¼ö¹®ÀÚ=>%16Áø¼ö º¯È¯) </summary>
-		/// <returns>ÀÎÄÚµùµÈ ¹®ÀÚ¿­</returns>
+		/// <summary> URLï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ï¿½Õ´Ï´ï¿½. (Æ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½=>%16ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯) </summary>
+		/// <returns>ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½</returns>
 		public static string Encode(string input)
 		{
 			return Uri.EscapeDataString(input);
 		}
 
-		/// <summary>URLÀ» µðÄÚµùÇÕ´Ï´Ù. (%16Áø¼ö=>Æ¯¼ö¹®ÀÚ º¯È¯)
-		/// <returns>µðÄÚµùµÈ ¹®ÀÚ¿­</returns>
+		/// <summary>URLï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ï¿½Õ´Ï´ï¿½. (%16ï¿½ï¿½ï¿½ï¿½=>Æ¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯)
+		/// <returns>ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½</returns>
 		public static string Decode(string input)
 		{
 			return Uri.UnescapeDataString(input);
 		}
 
-		/// <summary>URLÀÇ À¯È¿¼ºÀ» °Ë»çÇÕ´Ï´Ù. </summary>
-		/// <returns>À¯È¿ÇÑ URLÀÌ¸é true, ±×·¸Áö ¾ÊÀ¸¸é false</returns>
+		/// <summary>URLï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½ï¿½Õ´Ï´ï¿½. </summary>
+		/// <returns>ï¿½ï¿½È¿ï¿½ï¿½ URLï¿½Ì¸ï¿½ true, ï¿½×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ false</returns>
 		public static bool Validate(string url)
 		{
 			return Uri.TryCreate(url, UriKind.Absolute, out _);

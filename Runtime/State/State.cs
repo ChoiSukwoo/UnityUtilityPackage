@@ -1,55 +1,54 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
-namespace Suk
+namespace Suk.State
 {
 	public class State<T>
 	{
-		private T _value;
-		UnityEvent<T> _onValueChanged = new UnityEvent<T>();
+		T _value;
+		readonly UnityEvent<T> _onValueChanged = new UnityEvent<T>();
 
-		public State(T value)
+		public State(T value) { _value = value; }
+
+		#region ì™¸ë¶€ ì´ë²¤íŠ¸
+		public T Value => _value;
+		
+		public void SetValue(T newValue, bool force = false)
 		{
-			_value = value;
+			if (!force && IsEqual(newValue))
+				return;
+			_value = newValue;
+			_onValueChanged?.Invoke(_value); // ê°’ ë³€ê²½ ì‹œ ë¦¬ìŠ¤ë„ˆ í˜¸ì¶œ
 		}
-
-		// »óÅÂ°¡ º¯°æµÉ¶§ ½ÇÇàµÉ ÀÌº¥Æ® Ãß°¡
-		public void AddListener(UnityAction<T> listener)
-		{
-			_onValueChanged.AddListener(listener);
-		}
-
-		//¸®½º³Ê¸¦ ÇÏ³ª·Î ¼³Á¤
+		
+		public void SetValue(Func<T, T> prev, bool force = false) {SetValue(prev(Value), force); }
+		// ê°’ ë³€ê²½ ì‹œ í˜¸ì¶œë  ë¦¬ìŠ¤ë„ˆ ì¶”ê°€
+		public void AddListener(UnityAction<T> listener) { _onValueChanged.AddListener(listener); }
+		// ê¸°ì¡´ ë¦¬ìŠ¤ë„ˆë¥¼ ì œê±°í•˜ê³  ìƒˆë¡œìš´ ë¦¬ìŠ¤ë„ˆ ì„¤ì •
 		public void SetListener(UnityAction<T> listener)
 		{
 			_onValueChanged.RemoveAllListeners();
 			_onValueChanged.AddListener(listener);
 		}
+		// ëª¨ë“  ë¦¬ìŠ¤ë„ˆ ì œê±°
+		public void RemoveListeners(UnityAction<T> listener) { _onValueChanged.RemoveListener(listener); }
+		// ëª¨ë“  ë¦¬ìŠ¤ë„ˆ ì œê±°
+		public void RemoveAllListeners() { _onValueChanged.RemoveAllListeners(); }
+		#endregion
 
-		//¸®½º³Ê¸¦ ÇÏ³ª·Î ¼³Á¤
-		public void ClearListener()
-		{
-			_onValueChanged.RemoveAllListeners();
-		}
-
-		// »óÅÂ °ªÀ» °®´Â ÇÁ·ÎÆÛÆ¼
-		public T Value
-		{
-			get => _value;
-			set => SetValue(value);
-		}
-
-		public void SetValue(T value, bool force = false)
-		{
-			if (!force && EqualityComparer<T>.Default.Equals(_value, value))
-				return;
-
-			_value = value;
-			_onValueChanged?.Invoke(value); // ÀÌº¥Æ® È£Ãâ
-		}
-
+		#region ë‚´ë¶€ ì´ë²¤íŠ¸
+		bool IsEqual(T newValue) { return EqualityComparer<T>.Default.Equals(_value, newValue); }
 		int ListenerCount => _onValueChanged.GetPersistentEventCount();
+		#endregion
 
-		public override string ToString() => $"State<{typeof(T).Name}>: Current Value = {_value}, Listeners = {ListenerCount}";
+		public override string ToString()
+		{
+			var stringBuilder = new System.Text.StringBuilder();
+			stringBuilder.AppendLine($"State<{typeof(T).Name}>: ");
+			stringBuilder.AppendLine($"  Current Value : {Value} ");
+			stringBuilder.Append($"  Listeners Count : {ListenerCount}");
+			return stringBuilder.ToString();
+		}
 	}
 }

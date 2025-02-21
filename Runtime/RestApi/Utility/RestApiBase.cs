@@ -16,38 +16,38 @@ namespace Suk.RestApi
 		{
 			using (UnityWebRequest request = UnityWebRequest.Get(url))
 			{
-				// 1. Çì´õ ¼³Á¤
+				// 1. ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				SetRequestHeaders(request, headers);
 
-				// 2. ´Ù¿î·Îµå ÇÚµé·¯ ¼³Á¤
+				// 2. ï¿½Ù¿ï¿½Îµï¿½ ï¿½Úµé·¯ ï¿½ï¿½ï¿½ï¿½
 				request.downloadHandler = CreateDownloadHandler(url, expectedType);
 
-				// 3. Àü¼Û »óÅÂ¸¦ µð¹ö±ë ·Î±×¿¡ Ãâ·Â
+				// 3. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î±×¿ï¿½ ï¿½ï¿½ï¿½
 				Stopwatch stopwatch = Stopwatch.StartNew();
 				RestApiDebug.Request(request, headers, stopwatch);
 
-				// 4. ¿äÃ» ½ÃÀÛ ¹× Àü¼Û »óÅÂ ÃßÀû
+				// 4. ï¿½ï¿½Ã» ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
 				await UpdateProgress(asyncOperation, onProgress, cancellationToken);
 
-				//ÄÜÅÙÃ÷ Å¸ÀÔ ÃßÃâ
+				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				string contentType = request.GetResponseHeader("Content-Type");
 
-				// 5. ¿äÃ» ÈÄ Content-Type È®ÀÎ
+				// 5. ï¿½ï¿½Ã» ï¿½ï¿½ Content-Type È®ï¿½ï¿½
 				if (!ValidateContentType(request, ref expectedType))
 				{
 					RestApiDebug.Result(request, ContentTypeState.Unknown, stopwatch);
 					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
-				// 6. ¿äÃ» °á°ú¸¦ µð¹ö±ë ·Î±×¿¡ Ãâ·Â
+				// 6. ï¿½ï¿½Ã» ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î±×¿ï¿½ ï¿½ï¿½ï¿½
 				RestApiDebug.Result(request, expectedType, stopwatch);
 
-				// 7. ½ÇÆÐ Ã³¸®
+				// 7. ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
 				if (request.result != UnityWebRequest.Result.Success)
 					throw new Exception($"Api Request failed: {request.error}");
 
-				// 8. ÀÀ´ä Ã³¸® ¹× ¹ÝÈ¯
+				// 8. ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
 				T result = await ParseResponse<T>(request, expectedType, contentType);
 
 				return result;
@@ -59,40 +59,40 @@ namespace Suk.RestApi
 
 			using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
 			{
-				// 1. Çì´õ ¼³Á¤
+				// 1. ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				SetRequestHeaders(request, headers);
 
-				// 2. ¹Ùµð µ¥ÀÌÅÍ¸¦ ¾÷·Îµå ÇÚµé·¯¿¡ Ãß°¡
+				// 2. ï¿½Ùµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½Úµé·¯ï¿½ï¿½ ï¿½ß°ï¿½
 				request.uploadHandler = new UploadHandlerRaw(bodyData);
 
-				// 3. ´Ù¿î·Îµå ÇÚµé·¯ ¼³Á¤
+				// 3. ï¿½Ù¿ï¿½Îµï¿½ ï¿½Úµé·¯ ï¿½ï¿½ï¿½ï¿½
 				request.downloadHandler = CreateDownloadHandler(url, expectedType);
 
-				// 4. Àü¼Û »óÅÂ¸¦ »ç¿ëÀÚ¿¡°Ô ¾Ë¸²
+				// 4. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½
 				Stopwatch stopwatch = Stopwatch.StartNew();
 				RestApiDebug.Request(request, headers, stopwatch);
 
-				// 5. ¿äÃ» ½ÃÀÛ ¹× Àü¼Û »óÅÂ ÃßÀû
+				// 5. ï¿½ï¿½Ã» ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
 				await UpdateProgress(asyncOperation, onProgress, cancellationToken);
 
 				string contentType = request.GetResponseHeader("Content-Type");
 
-				// 5. ¿äÃ» ÈÄ Content-Type È®ÀÎ
+				// 5. ï¿½ï¿½Ã» ï¿½ï¿½ Content-Type È®ï¿½ï¿½
 				if (!ValidateContentType(request, ref expectedType))
 				{
 					RestApiDebug.Result(request, ContentTypeState.Unknown, stopwatch);
 					throw new Exception($"Unrecognized or missing Content-Type: {contentType}");
 				}
 
-				// 7. °á°ú Ãâ·Â
+				// 7. ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 				RestApiDebug.Result(request, expectedType, stopwatch);
 
-				// 7. ½ÇÆÐ Ã³¸®
+				// 7. ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
 				if (request.result != UnityWebRequest.Result.Success)
 					throw new Exception($"Api Request failed: {request.error}");
 
-				// 8. ÀÀ´ä Ã³¸® ¹× ¹ÝÈ¯
+				// 8. ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
 				return await ParseResponse<T>(request, expectedType, contentType);
 			}
 		}
