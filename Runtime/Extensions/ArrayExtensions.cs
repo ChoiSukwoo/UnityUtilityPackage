@@ -1,24 +1,27 @@
 using System;
 using System.Linq;
-using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 namespace Suk.Extensions
 {
 	public static class ArrayExtensions
 	{
-		// Map 메서드
+
+		// 반환값이 있는 Map: 배열을 변환하고 리스트로 반환
 		public static TResult[] Map<TSource, TResult>(this TSource[] array, Func<TSource, TResult> action) { return array.Select(action).ToArray(); }
 
 		public static TResult[] Map<TSource, TResult>(this TSource[] array, Func<TSource, int, TResult> action) { return array.Select(action).ToArray(); }
 
-		public static void Map<TSource>(this TSource[] array, UnityAction<TSource> action)
+		public static TResult[] Map<TResult>(this int self, Func<int, TResult> action) { return Enumerable.Range(0, self).Select(action).ToArray(); }
+
+		// 반환값이 없는 ForEach: 배열을 반복하며 Action 실행
+		public static void ForEach<TSource>(this TSource[] array, Action<TSource> action)
 		{
-			foreach (var item in array)
+			foreach (TSource item in array)
 				action(item);
 		}
 
-		public static void Map<TSource>(this TSource[] array, UnityAction<TSource, int> action)
+		public static void ForEach<TSource>(this TSource[] array, Action<TSource, int> action)
 		{
 			for (int i = 0; i < array.Length; i++)
 				action(array[i], i);
@@ -38,19 +41,6 @@ namespace Suk.Extensions
 			for (int i = 0; i < array.Length; i++)
 				result = accumulator(result, array[i], i);
 			return result;
-		}
-
-		// ForEach function: 배열의 각 요소에 대해 주어진 액션을 수행합니다.
-		public static void ForEach<TSource>(this TSource[] array, Action<TSource> action)
-		{
-			foreach (var item in array)
-				action(item);
-		}
-
-		public static void ForEach<TSource>(this TSource[] array, Action<TSource, int> action)
-		{
-			for (int i = 0; i < array.Length; i++)
-				action(array[i], i);
 		}
 
 		/// <summary>배열에서 랜덤한 요소를 가져옵니다.</summary>
@@ -91,7 +81,7 @@ namespace Suk.Extensions
 		/// <summary>Shuffle 메서드를 랜덤 시드(seed)를 사용하여 섞습니다.</summary>
 		public static void Shuffle<T>(this T[] array, int seed)
 		{
-			var state = Random.state;
+			Random.State state = Random.state;
 			Random.InitState(seed);
 			Shuffle(array);
 			Random.state = state;

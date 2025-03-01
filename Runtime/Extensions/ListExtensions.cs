@@ -1,29 +1,45 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 namespace Suk.Extensions
 {
 	public static class ListExtensions
 	{
-		// Map 메서드
+		//반환값 있는 Map
 		public static List<TResult> Map<TSource, TResult>(this List<TSource> list, Func<TSource, TResult> action) { return list.Select(action).ToList(); }
 
 		public static List<TResult> Map<TSource, TResult>(this List<TSource> list, Func<TSource, int, TResult> action) { return list.Select(action).ToList(); }
 
-		public static void Map<TSource>(this List<TSource> list, UnityAction<TSource> action)
+		public static List<TResult> Map<TResult>(this int self, Func<int, TResult> action) { return Enumerable.Range(0, self).Select(action).ToList(); }
+		public static List<TResult> Map<TResult>(this int self, Func<TResult> action) { return Enumerable.Range(0, self).Select(_ => action()).ToList(); }
+
+		//반환값 없는 ForEach
+		public static void ForEach<TSource>(this List<TSource> list, Action<TSource> action)
 		{
-			foreach (var item in list)
+			foreach (TSource item in list)
 				action(item);
 		}
 
-		public static void Map<TSource>(this List<TSource> list, UnityAction<TSource, int> action)
+		public static void ForEach<TSource>(this List<TSource> list, Action<TSource, int> action)
 		{
 			for (int i = 0; i < list.Count; i++)
 				action(list[i], i);
 		}
+
+		public static void ForEach(this int self, Action<int> action)
+		{
+			foreach (int i in Enumerable.Range(0, self))
+				action(i);
+		}
+
+		public static void ForEach(this int self, Action action)
+		{
+			foreach (int i in Enumerable.Range(0, self))
+				action();
+		}
+
 
 		// Filter function: 조건에 맞는 요소들만 필터링하여 새로운 리스트를 반환합니다.
 		public static List<TSource> Filter<TSource>(this List<TSource> list, Func<TSource, bool> predicate) { return list.Where(predicate).ToList(); }
@@ -39,20 +55,6 @@ namespace Suk.Extensions
 			for (int i = 0; i < list.Count; i++)
 				result = accumulator(result, list[i], i);
 			return result;
-		}
-
-
-		// ForEach function: 리스트의 각 요소에 대해 주어진 액션을 수행합니다.
-		public static void ForEach<TSource>(this List<TSource> list, Action<TSource> action)
-		{
-			foreach (var item in list)
-				action(item);
-		}
-
-		public static void ForEach<TSource>(this List<TSource> list, Action<TSource, int> action)
-		{
-			for (int i = 0; i < list.Count; i++)
-				action(list[i], i);
 		}
 
 		/// <summary>리스트에서 랜덤한 요소를 가져옵니다.</summary>
@@ -93,7 +95,7 @@ namespace Suk.Extensions
 		/// <summary>Shuffle 메서드를 랜덤 시드(seed)를 사용하여 섞습니다.</summary>
 		public static void Shuffle<T>(this IList<T> list, int seed)
 		{
-			var state = Random.state;
+			Random.State state = Random.state;
 			Random.InitState(seed);
 			Shuffle(list);
 			Random.state = state;
@@ -150,5 +152,16 @@ namespace Suk.Extensions
 
 		/// <summary>주어진 인덱스가 리스트의 범위 내에 있는지 확인합니다.</summary>
 		public static bool HasIndex<T>(this IList<T> list, int index) { return index >= 0 && index <= list.Count - 1; }
+
+		public static bool TryGetValue<T>(this IList<T> list, int index, out T value)
+		{
+			if (list == null || index < 0 || index >= list.Count) {
+				value = default;
+				return false;
+			}
+
+			value = list[index];
+			return true;
+		}
 	}
 }
