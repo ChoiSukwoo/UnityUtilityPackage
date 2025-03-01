@@ -1,11 +1,11 @@
 {
   "name": "com.sukwoo.utility",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "Suk Utility Package",
   "author": {
     "name": "sukwoo"
   },
-  "description": "최석우 유틸리티 패키지",
+  "description": "\ucd5c\uc11d\uc6b0 \uc720\ud2f8\ub9ac\ud2f0 \ud328\ud0a4\uc9c0",
   "unity": "2022.3",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2",

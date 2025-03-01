@@ -150,5 +150,17 @@ namespace Suk.Extensions
 
 		/// <summary>주어진 인덱스가 리스트의 범위 내에 있는지 확인합니다.</summary>
 		public static bool HasIndex<T>(this IList<T> list, int index) { return index >= 0 && index <= list.Count - 1; }
+
+		public static bool TryGetValue(this IList<string> list, int index, out string value)
+		{
+			if (list == null || index < 0 || index >= list.Count)
+			{
+				value = null;
+				return false;
+			}
+
+			value = list[index];
+			return true;
+		}
 	}
 }
